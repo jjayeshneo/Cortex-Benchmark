@@ -23,17 +23,22 @@
     "corpus_version": "v1.1",
     "data_snapshot_id": "wm_synthetic_v1.1_2026_06_24",
     "scorer_version": "cortex_scorer_v1.6",
-    "runs": 1,
+    "runs": 2,
     "denominator": 190,
     "attempted": 149,
     "evidence_provided": true,
     "verified_by_organizers": true,
-    "evaluated_at": "2026-08-17T13:02:49Z"
+    "evaluated_at": "2026-08-19T16:51:00Z"
   },
   "results": {
     "execution_accuracy": {
-      "mean": 0.368421,
-      "n": 70
+      "mean": 0.502632,
+      "n": 96,
+      "std": 0.026051,
+      "runs": [
+        0.484211,
+        0.521053
+      ]
     },
     "session_accuracy": {
       "mean": null,
@@ -43,35 +48,37 @@
       "mean": 0.0
     },
     "pass_any": {
-      "mean": null,
-      "unavailable_reason": "One run only. pass@N and pass^N need at least two."
+      "mean": 0.557895,
+      "n": 106
     },
     "pass_all": {
-      "mean": null,
-      "unavailable_reason": "One run only. pass@N and pass^N need at least two."
+      "mean": 0.447368,
+      "n": 85
     },
     "cost_usd_per_task": {
       "mean": null,
-      "unavailable_reason": "Per-task cost was not recorded during this run."
+      "unavailable_reason": "Per-task cost was not recorded during these runs."
     },
     "median_latency_s": {
-      "mean": 21.7
+      "mean": null,
+      "unavailable_reason": "These two captures record no per-task timing."
     },
     "by_tier": {
       "1": 0.8571,
-      "2": 0.8,
-      "3": 0.4857,
-      "4": 0.5429,
-      "5": 0.0667,
-      "6": 0.0,
-      "7": 0.9
+      "2": 0.6667,
+      "3": 0.6857,
+      "4": 0.6571,
+      "5": 0.3333,
+      "6": 0.08,
+      "7": 0.9,
+      "9": 0.0
     }
   },
   "declarations": {
     "canary_check": "not-applicable",
     "test_data_seen": false,
     "human_in_loop": false,
-    "artifacts": "runs/final149/ (organizer-side)",
-    "notes": "Scored against the v1.1 snapshot, so it is NOT comparable with the v1.3 rows and is not ranked against them. Its captured SQL cannot be replayed: the agent emits parameterised SQL (:p0 placeholders) and the bound values were never recorded, so 148 of 149 queries fail to parse outside the original session. A comparable number therefore requires re-running the agent, not re-scoring the capture. Single-turn only: the 41 multi-turn turns were not attempted and count as failures, so 70/190 here is 36.8% where the 149-task subset figure is 47.0%."
+    "artifacts": "runs/rerun2_full.jsonl, runs/run3_full.jsonl (organizer-side)",
+    "notes": "Two independent runs, scored against the v1.1 snapshot: 92 and 99 of 190. NOT comparable with the v1.3 rows and therefore unranked -- gold answers are bound to the snapshot they were compiled against. Its captured SQL cannot be replayed onto a newer snapshot: the agent emits parameterised SQL (:p0 placeholders) and the bound values were never recorded, so 148 of 149 queries fail to parse outside the original session. A comparable figure needs the agent re-run, not the capture re-scored. Single-turn only: the 41 multi-turn turns were not attempted and count as failures."
   }
 }

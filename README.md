@@ -27,33 +27,24 @@ that they do not is depth in one domain, conversations, and questions designed t
 Live board: **[jjayeshneo.github.io/Cortex-Benchmark](https://jjayeshneo.github.io/Cortex-Benchmark/)** —
 generated from `results/*.json`, one committed file per row.
 
-| | System | Model | EX (mean ± sd) | pass@N / pass^N | Coverage | Snapshot |
-|---|---|---|---|---|---|---|
-| — | *Null floor — answers nothing* | *none* | *4.7%* | — | 190/190 | v1.3 |
-| 1 | LangChain SQL agent | gpt-5.6-luna | **53.3% ± 1.6** | 117 / 86 | 149/190 | v1.3 |
-| — | *Neo-Cortex* | *not recorded* | *36.8%* | — | 149/190 | **v1.1** |
+| | System | Model | Pass^N | Pass@N | EX (mean ± sd) | Runs | Snapshot |
+|---|---|---|---|---|---|---|---|
+| 1 | LangChain SQL agent | gpt-5.6-luna | **45.3%** | 61.6% | 53.3% ± 1.6 | 3 | v1.3 |
+| — | *Neo-Cortex* | *not recorded* | *44.7%* | *55.8%* | *50.3% ± 2.6* | 2 | **v1.1** |
 
-**Every number on this board is a mean over three runs, and the denominator is always 190.** Two
+**The board ranks on Pass^N — a task counts only if the system solves it on every run.** Three
 things follow that are easy to miss:
 
-- **Skipping does not help you.** The LangChain baseline is single-turn, so it never attempts the
-  41 multi-turn turns and they score as failures. On the 149 tasks it does attempt it gets
-  **68.0%** — that is a legitimate figure, but it is a *subset* figure and it does not go in the
-  ranking column.
-- **A single run is not reproducible.** Runs of 102, 98 and 104 look like a stable system. They are
-  not: **31 tasks (21%) change verdict between runs** at identical settings. `pass@3` (passed at
-  least once) is 117; `pass^3` (passed every time) is 86. The 31-task gap is churn, and a
-  leaderboard reporting one number per system is publishing it as signal.
+- **Ranking on the average would reward unreliability.** LangChain averages 53.3% but only 45.3%
+  of tasks survive all three runs; **31 tasks (21%) change verdict between identical runs** at
+  temperature 0. Pass@3 is 117 tasks, Pass^3 is 86. That 31-task gap is churn, and a leaderboard
+  that reports one number per system is publishing it as signal.
+- **Skipping does not help you.** The denominator is always 190. Both systems are single-turn, so
+  neither attempts the 41 multi-turn turns and those score as failures.
 - **Snapshots never mix in a ranking.** Neo-Cortex was measured against the v1.1 snapshot, so its
-  figure is real but not comparable with the ranked rows and it takes no rank. Gold answers are
-  bound to the snapshot they were compiled against.
-
-**The floor row is there on purpose.** A system that answers nothing at all scores 4.7%, because
-some questions in this benchmark genuinely have no rows to return. Read every other score against
-that floor.
-
-*No human baseline yet. It is the most important missing number on the board and we will not claim
-one until it is measured.*
+  figures are real but not comparable with the ranked row, and it takes no rank. Gold answers are
+  bound to the snapshot they were compiled against, and its captured SQL cannot be replayed onto a
+  newer one, so a comparable number needs the agent re-run.
 
 ---
 

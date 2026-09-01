@@ -5,7 +5,14 @@
   "description": "One committed JSON file per leaderboard row. The results/ directory is the source of truth; the published site is a build artifact regenerated from these files. CI validates every entry against this schema on pull request.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["entry_id", "system", "model", "protocol", "results", "declarations"],
+  "required": [
+    "entry_id",
+    "system",
+    "model",
+    "protocol",
+    "results",
+    "declarations"
+  ],
   "properties": {
     "entry_id": {
       "type": "string",
@@ -15,18 +22,57 @@
     "system": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "organization", "open_source"],
+      "required": [
+        "name",
+        "organization",
+        "open_source"
+      ],
       "properties": {
-        "name": {"type": "string", "minLength": 1},
-        "version": {"type": ["string", "null"]},
-        "organization": {"type": "string", "minLength": 1},
-        "url": {"type": ["string", "null"], "format": "uri"},
-        "paper": {"type": ["string", "null"]},
-        "code": {"type": ["string", "null"]},
-        "open_source": {"type": "boolean"},
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "organization": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "paper": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "open_source": {
+          "type": "boolean"
+        },
         "kind": {
           "type": "string",
-          "enum": ["agent", "single-call", "framework", "human", "reference"],
+          "enum": [
+            "agent",
+            "single-call",
+            "framework",
+            "human",
+            "reference"
+          ],
           "description": "reference = a mechanical floor or ceiling row, not a competing system."
         }
       }
@@ -34,15 +80,50 @@
     "model": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "access"],
+      "required": [
+        "name",
+        "access"
+      ],
       "properties": {
-        "name": {"type": ["string", "null"], "description": "null only for human or mechanical entries."},
-        "provider": {"type": ["string", "null"]},
-        "access": {"type": "string", "enum": ["api", "open-weights", "local", "none"]},
-        "training_cutoff": {"type": ["string", "null"]},
-        "temperature": {"type": ["number", "null"]},
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "null only for human or mechanical entries."
+        },
+        "provider": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "api",
+            "open-weights",
+            "local",
+            "none"
+          ]
+        },
+        "training_cutoff": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "temperature": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
         "controlled": {
-          "type": ["boolean", "null"],
+          "type": [
+            "boolean",
+            "null"
+          ],
           "description": "true if the submitter controls the weights; false for a hosted endpoint that may change under them."
         }
       }
@@ -50,56 +131,149 @@
     "protocol": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["split", "corpus_version", "data_snapshot_id", "scorer_version", "runs", "denominator", "evaluated_at"],
+      "required": [
+        "split",
+        "corpus_version",
+        "data_snapshot_id",
+        "scorer_version",
+        "runs",
+        "denominator",
+        "evaluated_at"
+      ],
       "properties": {
-        "split": {"type": "string", "enum": ["sample", "dev", "test", "full"]},
-        "corpus_version": {"type": "string"},
+        "split": {
+          "type": "string",
+          "enum": [
+            "sample",
+            "dev",
+            "test",
+            "full"
+          ]
+        },
+        "corpus_version": {
+          "type": "string"
+        },
         "data_snapshot_id": {
           "type": "string",
           "description": "Gold answers are snapshot-bound. Entries scored against different snapshots are NOT comparable and the site groups them separately."
         },
-        "scorer_version": {"type": "string"},
-        "runs": {"type": "integer", "minimum": 1},
+        "scorer_version": {
+          "type": "string"
+        },
+        "runs": {
+          "type": "integer",
+          "minimum": 1
+        },
         "denominator": {
           "type": "integer",
           "description": "Total gradable tasks. Every entry on one board must share this number. Tasks the system did not attempt count as failures."
         },
-        "attempted": {"type": ["integer", "null"], "description": "Tasks the system actually produced an answer for. attempted < denominator is displayed, never hidden."},
-        "evidence_provided": {"type": ["boolean", "null"]},
-        "verified_by_organizers": {"type": "boolean", "default": false},
-        "evaluated_at": {"type": "string", "format": "date-time"}
+        "attempted": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Tasks the system actually produced an answer for. attempted < denominator is displayed, never hidden."
+        },
+        "evidence_provided": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "verified_by_organizers": {
+          "type": "boolean",
+          "default": false
+        },
+        "evaluated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
     },
     "results": {
       "type": "object",
-      "required": ["execution_accuracy"],
-      "additionalProperties": {"$ref": "#/definitions/metric"},
+      "required": [
+        "execution_accuracy"
+      ],
+      "additionalProperties": {
+        "$ref": "#/definitions/metric"
+      },
       "properties": {
-        "execution_accuracy": {"$ref": "#/definitions/metric"},
-        "session_accuracy": {"$ref": "#/definitions/metric"},
-        "multi_turn_session_accuracy": {"$ref": "#/definitions/metric"},
-        "multi_turn_turn_accuracy": {"$ref": "#/definitions/metric"},
-        "cost_usd_per_task": {"$ref": "#/definitions/metric"},
-        "median_latency_s": {"$ref": "#/definitions/metric"},
-        "pass_any": {"$ref": "#/definitions/metric"},
-        "pass_all": {"$ref": "#/definitions/metric"},
+        "execution_accuracy": {
+          "$ref": "#/definitions/metric"
+        },
+        "session_accuracy": {
+          "$ref": "#/definitions/metric"
+        },
+        "multi_turn_session_accuracy": {
+          "$ref": "#/definitions/metric"
+        },
+        "multi_turn_turn_accuracy": {
+          "$ref": "#/definitions/metric"
+        },
+        "cost_usd_per_task": {
+          "$ref": "#/definitions/metric"
+        },
+        "median_latency_s": {
+          "$ref": "#/definitions/metric"
+        },
+        "pass_any": {
+          "$ref": "#/definitions/metric"
+        },
+        "pass_all": {
+          "$ref": "#/definitions/metric"
+        },
         "by_tier": {
           "type": "object",
-          "description": "tier number -> accuracy averaged over all runs",
-          "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}
+          "description": "tier number -> pass^N for that tier: the fraction of the tier's tasks the system solved on EVERY run. Matches the headline metric, so a tier row and the board row mean the same thing.",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
         }
       }
     },
     "declarations": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["test_data_seen", "human_in_loop"],
+      "required": [
+        "test_data_seen",
+        "human_in_loop"
+      ],
       "properties": {
-        "canary_check": {"type": ["string", "null"], "enum": ["passed", "failed", "not-applicable", null]},
-        "test_data_seen": {"type": "boolean"},
-        "human_in_loop": {"type": "boolean"},
-        "artifacts": {"type": ["string", "null"], "description": "Where the raw per-task outputs live, if published."},
-        "notes": {"type": ["string", "null"]}
+        "canary_check": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "passed",
+            "failed",
+            "not-applicable",
+            null
+          ]
+        },
+        "test_data_seen": {
+          "type": "boolean"
+        },
+        "human_in_loop": {
+          "type": "boolean"
+        },
+        "artifacts": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Where the raw per-task outputs live, if published."
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     }
   },
@@ -107,18 +281,44 @@
     "metric": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mean"],
+      "required": [
+        "mean"
+      ],
       "properties": {
-        "mean": {"type": ["number", "null"]},
-        "std": {"type": ["number", "null"]},
+        "mean": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "std": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
         "runs": {
           "type": "array",
-          "items": {"type": ["number", "null"]},
+          "items": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
           "description": "Every run's value, including the bad ones. Cherry-picking a run is the single easiest way to fake a leaderboard number, so all runs are published."
         },
-        "n": {"type": ["integer", "null"], "description": "Numerator, where the metric is a count over `denominator`."},
+        "n": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Numerator, where the metric is a count over `denominator`."
+        },
         "unavailable_reason": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Set with mean:null when a metric could not be measured. A null with a reason is honest; a zero is a lie."
         }
       }

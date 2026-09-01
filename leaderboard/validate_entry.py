@@ -134,10 +134,18 @@ def selftest(schema: dict) -> int:
     import copy
     import tempfile
 
-    base = json.load(open(os.path.join(ROOT, "results", "2026-09-01-null-floor.json")))
+    # Use whatever entry is actually present rather than a hardcoded filename: the selftest must
+    # keep working when rows are added or retired, or it silently stops testing.
+    rdir = os.path.join(ROOT, "results")
+    names = sorted(f for f in os.listdir(rdir) if f.endswith(".json"))
+    if not names:
+        print("  no entries in results/ -- nothing to build the selftest from")
+        return 1
+    stem = names[0][:-5]
+    base = json.load(open(os.path.join(rdir, names[0])))
     cases = []
 
-    a = copy.deepcopy(base); a["entry_id"] = "2026-09-01-renamed"
+    a = copy.deepcopy(base); a["entry_id"] = "2026-01-01-renamed"
     cases.append(("entry_id not matching filename", a))
     b = copy.deepcopy(base); del b["protocol"]["data_snapshot_id"]
     cases.append(("missing data_snapshot_id", b))
@@ -158,7 +166,7 @@ def selftest(schema: dict) -> int:
     ok = True
     with tempfile.TemporaryDirectory() as td:
         for label, entry in cases:
-            fp = os.path.join(td, "2026-09-01-null-floor.json")
+            fp = os.path.join(td, f"{stem}.json")
             json.dump(entry, open(fp, "w"))
             errs = check_file(fp, schema)
             status = "REJECTED" if errs else "*** ACCEPTED ***"
@@ -168,7 +176,7 @@ def selftest(schema: dict) -> int:
             else:
                 ok = False
         # and the real entry must still pass
-        real = os.path.join(ROOT, "results", "2026-09-01-null-floor.json")
+        real = os.path.join(rdir, names[0])
         errs = check_file(real, schema)
         print(f"  [{'PASSED' if not errs else '*** REJECTED ***':<16}] the real entry validates")
         if errs:

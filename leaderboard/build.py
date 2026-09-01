@@ -94,6 +94,23 @@ def ex(entry: dict) -> float:
     return entry["results"]["execution_accuracy"].get("mean") or 0.0
 
 
+def passn(entry: dict) -> float:
+    """pass^N -- solved on EVERY run. The board's headline, and what it ranks on.
+
+    Ranking on the mean would reward a system that is right often but never twice in a row.
+    pass^N asks the question a buyer actually asks: can I rely on it?
+    """
+    m = entry["results"].get("pass_all") or {}
+    return m.get("mean") if m.get("mean") is not None else -1.0
+
+
+def dollars_per_correct(entry: dict):
+    """Cost per task divided by the pass^N rate: what you pay per task that actually passes."""
+    c = (entry["results"].get("cost_usd_per_task") or {}).get("mean")
+    r = passn(entry)
+    return None if c is None or r <= 0 else c / r
+
+
 # ----------------------------------------------------------------------------- formatting
 
 def pct(m, digits: int = 1, dash: str = "&mdash;") -> str:
@@ -124,65 +141,77 @@ def count(m) -> str:
 
 def board_rows(entries: list, snap: str) -> str:
     refs = [e for e in entries if band_of(e, snap) == "reference"]
-    ranked = sorted([e for e in entries if band_of(e, snap) == "measured"], key=ex, reverse=True)
-    legacy = sorted([e for e in entries if band_of(e, snap) == "legacy"], key=ex, reverse=True)
-    best = max([ex(e) for e in ranked], default=0.0)
-    scale = max([ex(e) for e in entries] + [0.01])
+    ranked = sorted([e for e in entries if band_of(e, snap) == "measured"], key=passn, reverse=True)
+    legacy = sorted([e for e in entries if band_of(e, snap) == "legacy"], key=passn, reverse=True)
+    best = max([passn(e) for e in ranked], default=0.0)
+    scale = max([passn(e) for e in entries] + [0.01])
 
     rows = []
-    for i, e in enumerate(refs + ranked + legacy):
+    for e in refs + ranked + legacy:
         band = band_of(e, snap)
         rank = str(ranked.index(e) + 1) if band == "measured" else "&mdash;"
-        s, p, r = e["system"], e["protocol"], e["results"]
-        lead = band == "measured" and abs(ex(e) - best) < 1e-9
-        width = 100 * ex(e) / scale
+        s_, p, r = e["system"], e["protocol"], e["results"]
+        lead = band == "measured" and abs(passn(e) - best) < 1e-9
+        width = 100 * max(passn(e), 0) / scale
+        n = p["runs"]
         att, den = p.get("attempted"), p["denominator"]
         cov = (f'<span class="warn" title="Did not attempt {den - att} of {den} tasks; '
-               f'they are scored as failures.">{att}/{den}</span>'
-               if att is not None and att < den else f'{att if att is not None else den}/{den}')
+               f'they are scored as failures.">{att}/{den} attempted</span>'
+               if att is not None and att < den else f'{den}/{den} attempted')
+
         # The sub-line describes what the row IS. A bare version string like "1.0" tells a reader
         # nothing, so it is only shown when it is descriptive.
-        ver = (s.get("version") or "").strip()
+        ver = (s_.get("version") or "").strip()
+        descriptive = ver and not ver.replace(".", "").isdigit()
         if e["model"].get("name"):
-            model = f'{html.escape(e["model"]["name"])}'
-            if ver and not ver.replace(".", "").isdigit():
-                model += f' &middot; {html.escape(ver)}'
-        elif ver and not ver.replace(".", "").isdigit():
+            model = html.escape(e["model"]["name"]) + (f' &middot; {html.escape(ver)}' if descriptive else "")
+        elif descriptive:
             model = html.escape(ver)
         else:
             model = "no model &middot; no data read" if band == "reference" else "model not recorded"
-        runs = r["execution_accuracy"].get("runs")
-        title = ("runs: " + ", ".join(f"{100*v:.1f}%" for v in runs)) if runs else "single run"
+
+        pill = BANDS[band][0]
+        if band == "legacy":
+            pill += " &middot; " + html.escape(p["data_snapshot_id"].split("_")[2])
+        runs_l = r["execution_accuracy"].get("runs")
+        title = ("runs: " + ", ".join(f"{100*v:.1f}%" for v in runs_l)) if runs_l else "single run"
+        dpc = dollars_per_correct(e)
+        dpc_cell = (f'${dpc:.4f}' if dpc is not None else
+                    '<span class="na" title="Needs both a cost per task and a pass^N rate.">'
+                    '&mdash;</span>')
+
         rows.append(f"""        <tr class="{band}">
           <td class="rank{' top' if lead else ''}">{rank}</td>
           <td>
             <div class="agent-cell">
               <span class="band-tick {band}"></span>
               <div>
-                <div class="agent-name">{html.escape(s['name'])}</div>
+                <div class="agent-name">{html.escape(s_['name'])}</div>
                 <div class="agent-arch">{model}</div>
+                <div class="agent-arch">{cov} &middot; {n} run{'s' if n != 1 else ''}</div>
               </div>
             </div>
           </td>
-          <td><span class="band-pill {band}">{BANDS[band][0]}</span></td>
+          <td><span class="band-pill {band}">{pill}</span></td>
           <td class="num" title="{title}">
             <div class="score-cell">
               <span class="bar"><span class="{'lead' if lead else ''}" style="width:{width:.1f}%"></span></span>
-              <span class="score-num{' lead' if lead else ''}">{pct(r['execution_accuracy'])}</span>
+              <span class="score-num{' lead' if lead else ''}">{pct(r.get('pass_all'))}</span>
             </div>
+            <div class="score-sub">EX {pct(r['execution_accuracy'])}</div>
           </td>
-          <td class="num sub-num">{count(r.get('pass_any'))} / {count(r.get('pass_all'))}</td>
-          <td class="num sub-num">{cov}</td>
+          <td class="num sub-num">{pct(r.get('pass_any'))}</td>
           <td class="num sub-num">{num(r.get('median_latency_s'), '.1f', suffix='s')}</td>
+          <td class="num sub-num">{num(r.get('tokens_per_task'), ',.0f')}</td>
           <td class="num sub-num">{num(r.get('cost_usd_per_task'), '.4f', prefix='$')}</td>
-          <td class="num sub-num">{html.escape(p['data_snapshot_id'].split('_')[2])}</td>
+          <td class="num sub-num">{dpc_cell}</td>
         </tr>""")
     return "\n".join(rows)
 
 
 def tier_table(entries: list, snap: str) -> str:
     order = ({"reference": 0, "measured": 1, "legacy": 2})
-    ents = sorted(entries, key=lambda e: (order[band_of(e, snap)], -ex(e)))
+    ents = sorted(entries, key=lambda e: (order[band_of(e, snap)], -passn(e)))
     tiers = sorted({int(t) for e in ents for t in (e["results"].get("by_tier") or {})})
     head = "".join(
         f'<th class="num" title="{html.escape(TIER_NAMES.get(t, ""))}">T{t}</th>' for t in tiers)
@@ -208,19 +237,19 @@ def tier_table(entries: list, snap: str) -> str:
 {chr(10).join(rows)}
         </tbody>
       </table>
-      <p class="note">{legend}. Values are % of tasks passed, averaged over every run.</p>"""
+      <p class="note">{legend}. Values are Pass^N: % of the tier solved on every run.</p>"""
 
 
 def scatter(entries: list, snap: str, metric: str, y_title: str, fmt: str) -> str:
     """Accuracy against cost or latency. Bottom-right is best."""
     pts = [(e, e["results"].get(metric, {}).get("mean")) for e in entries]
-    pts = [(e, y) for e, y in pts if y is not None and ex(e) > 0]
+    pts = [(e, y) for e, y in pts if y is not None and passn(e) > 0]
     if not pts:
         return ('<p class="note">No system has published this metric yet, so there is nothing to '
                 'plot. An unmeasured metric is left blank rather than drawn as a zero.</p>')
     W, H, L, R, T, B = 760, 400, 62, 24, 20, 52
     ymax = max(y for _, y in pts) * 1.25 or 1.0
-    xmax = max(ex(e) for e, _ in pts) * 1.20 or 1.0
+    xmax = max(passn(e) for e, _ in pts) * 1.20 or 1.0
 
     def sx(v): return L + (W - L - R) * (v / xmax)
     def sy(v): return H - B - (H - T - B) * (v / ymax)
@@ -240,21 +269,21 @@ def scatter(entries: list, snap: str, metric: str, y_title: str, fmt: str) -> st
         g.append(f'<text class="axis-label" x="{x:.1f}" y="{H-B+18}" text-anchor="middle">'
                  f'{100*xv:.0f}%</text>')
     g.append(f'<text class="axis-title" x="{(L+W-R)/2:.0f}" y="{H-B+40}" text-anchor="middle">'
-             f'Execution accuracy</text>')
+             f'Pass^N</text>')
     g.append(f'<text class="axis-title" x="-{(T+H-B)/2:.0f}" y="16" transform="rotate(-90)" '
              f'text-anchor="middle">{html.escape(y_title)}</text>')
     for e, y in sorted(pts, key=lambda p: -p[1]):
         band = band_of(e, snap)
-        cx, cy = sx(ex(e)), sy(y)
+        cx, cy = sx(passn(e)), sy(y)
         g.append(f'<circle class="pt {band}" cx="{cx:.1f}" cy="{cy:.1f}" r="6.5"/>')
         anchor = "end" if cx > (W - R) * 0.72 else "start"
         dx = -11 if anchor == "end" else 11
         g.append(f'<text class="pt-label" x="{cx+dx:.1f}" y="{cy-2:.1f}" text-anchor="{anchor}">'
                  f'{html.escape(e["system"]["name"])}</text>')
         g.append(f'<text class="pt-sub" x="{cx+dx:.1f}" y="{cy+11:.1f}" text-anchor="{anchor}">'
-                 f'{100*ex(e):.1f}% &middot; {format(y, fmt)}</text>')
+                 f'{100*passn(e):.1f}% &middot; {format(y, fmt)}</text>')
     return (f'<div class="scatter-box"><svg viewBox="0 0 {W} {H}" role="img" '
-            f'aria-label="{html.escape(y_title)} against execution accuracy">'
+            f'aria-label="{html.escape(y_title)} against Pass^N">'
             + "".join(g) + "</svg></div>")
 
 
@@ -340,6 +369,8 @@ CSS = """
   .score-num{font-family:var(--mono);font-weight:600;font-size:16px;min-width:86px;text-align:right}
   .score-num.lead{color:var(--accent)}
   .pm{color:var(--ink-faint);font-weight:400;font-size:13px}
+  .score-sub{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);text-align:right;
+             margin-top:3px;letter-spacing:.02em}
   .bar{width:110px;height:7px;background:var(--bar-track);border-radius:4px;overflow:hidden;flex:none}
   .bar>span{display:block;height:100%;background:var(--ink-soft);border-radius:4px}
   .bar>span.lead{background:var(--accent)}
@@ -421,6 +452,15 @@ def build(entries: list) -> str:
     runs = max((e["protocol"]["runs"] for e in ranked), default=1)
     built = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
+    present = []
+    for b, label in (("measured", "ranked, current snapshot"),
+                     ("reference", "control, not a competitor"),
+                     ("legacy", "older snapshot, unranked")):
+        if any(band_of(e, snap) == b for e in entries):
+            present.append(f'<span class="k"><span class="dot" style="background:var(--{b})">'
+                           f'</span>{BANDS[b][0]} &mdash; {label}</span>')
+    legend_keys = "".join(present)
+
     legacy_note = ""
     if legacy:
         names = ", ".join(html.escape(e["system"]["name"]) for e in legacy)
@@ -485,17 +525,14 @@ def build(entries: list) -> str:
 <section id="leaderboard">
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">01</span><h2>Leaderboard</h2></div>
-    <p class="sec-desc">Ranked by <strong>execution accuracy</strong> &mdash; the mean over every run,
-       with the standard deviation beside it. The denominator is always {den}: a system that does not
-       attempt a task is scored as failing it, and the coverage column shows what it skipped.
-       Skipping work must never raise a score.</p>
+    <p class="sec-desc">Ranked by <strong>Pass^N</strong> &mdash; a task counts only if the system
+       solves it correctly on <em>every</em> run. <strong>Pass@N</strong> (solved at least once) sits
+       beside it, and execution accuracy, the mean across runs with its spread, is printed under each
+       Pass^N figure. The denominator is always {den}: a system that does not attempt a task is scored
+       as failing it, and each row states what it skipped. Skipping work must never raise a score.</p>
 
     <div class="controls">
-      <div class="legend">
-        <span class="k"><span class="dot" style="background:var(--measured)"></span>Measured &mdash; ranked, current snapshot</span>
-        <span class="k"><span class="dot" style="background:var(--reference)"></span>Reference &mdash; control, not a competitor</span>
-        <span class="k"><span class="dot" style="background:var(--legacy)"></span>Legacy &mdash; older snapshot, unranked</span>
-      </div>
+      <div class="legend">{legend_keys}</div>
     </div>
 
     <div class="board-scroll">
@@ -505,12 +542,12 @@ def build(entries: list) -> str:
           <th style="width:34px">#</th>
           <th>System</th>
           <th>Band</th>
-          <th class="num">Execution accuracy</th>
-          <th class="num" title="Tasks passed at least once / passed on every run.">pass@N / pass^N</th>
-          <th class="num">Coverage</th>
+          <th class="num" title="Fraction of tasks solved on EVERY run. The ranking metric.">Pass^N</th>
+          <th class="num" title="Fraction of tasks solved at least once.">Pass@N</th>
           <th class="num">Latency</th>
+          <th class="num">Tokens/task</th>
           <th class="num">Cost/task</th>
-          <th class="num">Snapshot</th>
+          <th class="num" title="Cost per task divided by the pass^N rate.">$/correct</th>
         </tr>
       </thead>
       <tbody>
@@ -519,11 +556,12 @@ def build(entries: list) -> str:
     </table>
     </div>
 {floor_note}
-      <p class="note"><strong>Why the spread is printed.</strong> Two identical runs of the same agent
-      &mdash; same model, same questions, temperature&nbsp;0 &mdash; disagreed on 21% of tasks.
-      A single-run number implies a precision that does not exist, so three runs are required and
-      every run's score is published in the entry file. <b>pass@N</b> counts tasks solved at least
-      once; <b>pass^N</b> counts tasks solved every time. The gap between them is churn.</p>
+      <p class="note"><strong>Why the board ranks on Pass^N.</strong> Two identical runs of the same
+      agent &mdash; same model, same questions, temperature&nbsp;0 &mdash; disagreed on 21% of tasks.
+      Ranking on the average would reward a system that is often right and never reliably right, so
+      the ranking metric is the one a buyer actually cares about: solved every time. The gap between
+      <b>Pass@N</b> and <b>Pass^N</b> is churn, and it is large for every system measured so far.
+      Every individual run's score is published in the entry file, including the bad ones.</p>
 {legacy_note}
       <p class="note">A dash is not a zero. Hover it to see why the metric was not measured.</p>
   </div>
@@ -534,8 +572,9 @@ def build(entries: list) -> str:
     <div class="sec-head"><span class="sec-num">02</span><h2>Accuracy by difficulty tier</h2></div>
     <p class="sec-desc">Where each system actually loses. Tiers 1&ndash;2 are lookups and filters,
        3&ndash;5 add joins, aggregation and window functions, 6 requires applying Indian market and
-       taxation rules, 7 asks questions the data cannot answer, and 9 is multi-turn. Darker cells are
-       stronger.</p>
+       taxation rules, 7 asks questions the data cannot answer, and 9 is multi-turn. Cells are
+       Pass^N, the same metric the board ranks on, so a tier row and a board row mean the same
+       thing. Darker is stronger.</p>
     <div class="grid-scroll">
 {tier_table(entries, snap)}
     </div>
@@ -548,8 +587,8 @@ def build(entries: list) -> str:
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">03</span><h2>Cost and latency against accuracy</h2></div>
     <p class="sec-desc">What each system spends to get where it got. Accuracy runs along the
-       horizontal axis, so <strong>bottom-right is best</strong>: accurate and cheap, accurate and
-       fast. Correctness alone is not the whole picture on a 58-million-row database &mdash; a query
+       horizontal axis (Pass^N), so <strong>bottom-right is best</strong>: reliable and cheap,
+       reliable and fast. Correctness alone is not the whole picture on a 58-million-row database &mdash; a query
        that returns the right answer in six minutes is not a usable one.</p>
     <div class="scatter-grid">
 {scatter(entries, snap, "cost_usd_per_task", "USD per task", ".4f")}
