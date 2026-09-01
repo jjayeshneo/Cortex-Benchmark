@@ -1,150 +1,379 @@
-<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cortex-Bench leaderboard</title>
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cortex-Bench &mdash; Wealth-Management Text-to-SQL Leaderboard</title>
 <style>
-:root{--bg:#fff;--fg:#16181d;--muted:#6b7280;--line:#e5e7eb;--accent:#1d4ed8;
-      --warn:#b45309;--refbg:#f8fafc;--hot:#b91c1c}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1115;--fg:#e8eaed;--muted:#9aa3af;
-      --line:#262b33;--accent:#7aa2ff;--warn:#e0a33e;--refbg:#161a21;--hot:#f87171}}
-*{box-sizing:border-box}
-body{margin:0;padding:2.2rem 1.2rem 4rem;background:var(--bg);color:var(--fg);
-     font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-main{max-width:1180px;margin:0 auto}
-h1{font-size:1.9rem;margin:0 0 .2rem;letter-spacing:-.02em}
-h2{font-size:1.15rem;margin:2.6rem 0 .6rem;letter-spacing:-.01em}
-.tagline{color:var(--muted);margin:0 0 1.6rem}
-.wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
-table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:960px}
-th,td{padding:.6rem .7rem;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
-th{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-tbody tr:last-child td{border-bottom:none}
-td.rank{color:var(--muted);font-variant-numeric:tabular-nums}
-td.ex{font-weight:650;font-variant-numeric:tabular-nums}
-.sub{color:var(--muted);font-size:11.5px;font-weight:400;white-space:normal}
-.pm{color:var(--muted);font-weight:400}
-.na{color:var(--muted);cursor:help}
-.warn{color:var(--warn);cursor:help;font-weight:600}
-.refrow{background:var(--refbg)}
-.refrow td.sys strong{font-weight:600}
-.v-yes{color:#15803d}.v-no{color:var(--muted)}
-@media (prefers-color-scheme:dark){.v-yes{color:#4ade80}}
-.tiers{min-width:640px;border:1px solid var(--line);border-radius:10px}
-.tiers td{font-variant-numeric:tabular-nums}
-.tiers td.hot{color:var(--hot);font-weight:600}
-.legend{color:var(--muted);font-size:12px}
-.note{border-left:3px solid var(--accent);padding:.15rem 0 .15rem 1rem;margin:1rem 0;
-      color:var(--fg)}
-.note strong{font-weight:650}
-ul{padding-left:1.15rem}li{margin:.35rem 0}
-code{font:12.5px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;
-     background:var(--refbg);padding:.1rem .3rem;border-radius:4px}
-footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);
-       color:var(--muted);font-size:12.5px}
-a{color:var(--accent)}
+  :root{
+    --paper:#FBFAF7; --paper-2:#F3F1EB; --ink:#1A1D1A; --ink-soft:#5A5F57; --ink-faint:#8A8F84;
+    --rule:#DAD7CD; --rule-strong:#B9B5A8; --accent:#0F6E63; --accent-soft:#0F6E6318;
+    --measured:#2B4C6F; --reference:#8A5A2B; --legacy:#7A7468; --warn:#9A5B12;
+    --bar-track:#E4E1D8;
+    --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"SFMono-Regular",ui-monospace,"JetBrains Mono","Menlo",Consolas,monospace;
+  }
+  [data-theme="dark"]{
+    --paper:#14150F; --paper-2:#1D1F17; --ink:#EDEBE1; --ink-soft:#A9A99C; --ink-faint:#74766A;
+    --rule:#2C2E23; --rule-strong:#3D4030; --accent:#4FBFAF; --accent-soft:#4FBFAF1F;
+    --measured:#7FA8CE; --reference:#C99A5F; --legacy:#8E8878; --warn:#E0A33E;
+    --bar-track:#26281D;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;
+       -webkit-font-smoothing:antialiased;transition:background .3s ease,color .3s ease}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+  a{color:var(--accent)}
+
+  .topbar{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:50;
+          background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px)}
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{display:flex;align-items:baseline;gap:10px;font-family:var(--serif)}
+  .brand .mark{font-size:20px;font-weight:600;letter-spacing:-.01em}
+  .brand .sub{font-size:12px;color:var(--ink-faint);font-family:var(--mono);
+              text-transform:uppercase;letter-spacing:.08em}
+  .nav{display:flex;gap:26px;align-items:center}
+  .nav a{color:var(--ink-soft);text-decoration:none;font-size:13.5px}
+  .nav a:hover{color:var(--ink)}
+  .theme-btn{font-family:var(--mono);font-size:11px;letter-spacing:.06em;background:none;
+             border:1px solid var(--rule-strong);color:var(--ink-soft);padding:6px 11px;
+             border-radius:2px;cursor:pointer;text-transform:uppercase}
+  .theme-btn:hover{border-color:var(--ink-soft);color:var(--ink)}
+
+  .hero{padding:64px 0 40px;border-bottom:1px solid var(--rule)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--accent);margin-bottom:20px}
+  .hero h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,50px);line-height:1.06;
+           letter-spacing:-.02em;max-width:17ch;margin-bottom:20px}
+  .hero p{font-size:16.5px;color:var(--ink-soft);max-width:64ch}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:28px;margin-top:34px}
+  .hero-stat .n{font-family:var(--mono);font-size:26px;font-weight:600;letter-spacing:-.02em}
+  .hero-stat .l{font-size:12px;color:var(--ink-faint);text-transform:uppercase;
+                letter-spacing:.06em;margin-top:2px}
+
+  section{padding:52px 0;border-bottom:1px solid var(--rule)}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+  .sec-num{font-family:var(--mono);font-size:12px;color:var(--ink-faint)}
+  .sec-head h2{font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:-.01em}
+  .sec-desc{color:var(--ink-soft);font-size:15px;max-width:70ch;margin-bottom:26px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin-bottom:22px}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;font-size:12.5px;color:var(--ink-soft)}
+  .legend .k{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+
+  .board-scroll{overflow-x:auto}
+  .board{width:100%;border-collapse:collapse;font-size:14.5px;min-width:900px}
+  .board thead th{text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.07em;
+                  text-transform:uppercase;color:var(--ink-faint);font-weight:500;
+                  padding:0 16px 12px;border-bottom:1px solid var(--rule-strong);white-space:nowrap}
+  .board thead th.num,.board tbody td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .board tbody tr{border-bottom:1px solid var(--rule);transition:background .12s}
+  .board tbody tr:hover{background:var(--paper-2)}
+  .board tbody td{padding:15px 16px;vertical-align:middle}
+  .board tbody tr.legacy .agent-name,.board tbody tr.reference .agent-name{font-weight:500}
+  .rank{font-family:var(--mono);font-size:15px;color:var(--ink-faint);width:34px}
+  .rank.top{color:var(--accent);font-weight:600}
+  .agent-cell{display:flex;align-items:center;gap:12px}
+  .band-tick{width:3px;height:32px;border-radius:2px;flex:none;background:var(--measured)}
+  .band-tick.reference{background:var(--reference)}
+  .band-tick.legacy{background:var(--legacy)}
+  .agent-name{font-weight:600;font-size:15px}
+  .agent-arch{font-size:12px;color:var(--ink-faint);font-family:var(--mono);margin-top:1px}
+  .score-cell{display:flex;align-items:center;gap:12px;justify-content:flex-end}
+  .score-num{font-family:var(--mono);font-weight:600;font-size:16px;min-width:86px;text-align:right}
+  .score-num.lead{color:var(--accent)}
+  .pm{color:var(--ink-faint);font-weight:400;font-size:13px}
+  .bar{width:110px;height:7px;background:var(--bar-track);border-radius:4px;overflow:hidden;flex:none}
+  .bar>span{display:block;height:100%;background:var(--ink-soft);border-radius:4px}
+  .bar>span.lead{background:var(--accent)}
+  .sub-num{font-family:var(--mono);font-size:13.5px;color:var(--ink-soft);white-space:nowrap}
+  .band-pill{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+             padding:3px 7px;border-radius:2px;white-space:nowrap;color:var(--measured);
+             background:color-mix(in srgb,var(--measured) 12%,transparent)}
+  .band-pill.reference{color:var(--reference);
+             background:color-mix(in srgb,var(--reference) 12%,transparent)}
+  .band-pill.legacy{color:var(--legacy);
+             background:color-mix(in srgb,var(--legacy) 14%,transparent)}
+  .na{color:var(--ink-faint);cursor:help}
+  .warn{color:var(--warn);cursor:help}
+
+  .note{font-size:12.5px;color:var(--ink-faint);margin-top:16px;line-height:1.65;max-width:82ch}
+  .note strong,.note b{color:var(--ink-soft);font-weight:600}
+  .note+.note{margin-top:9px}
+
+  .grid-scroll{overflow-x:auto}
+  .breakdown{width:100%;border-collapse:collapse;font-size:13.5px;min-width:660px}
+  .breakdown th,.breakdown td{padding:11px 14px;text-align:right;font-variant-numeric:tabular-nums}
+  .breakdown th:first-child,.breakdown td:first-child{text-align:left}
+  .breakdown thead th{font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+       text-transform:uppercase;color:var(--ink-faint);font-weight:500;
+       border-bottom:1px solid var(--rule-strong)}
+  .breakdown tbody tr{border-bottom:1px solid var(--rule)}
+  .breakdown tbody td:first-child{font-family:var(--sans);font-size:14px;color:var(--ink);
+       font-weight:600}
+  .heat{font-family:var(--mono);padding:4px 9px;border-radius:3px;display:inline-block;min-width:44px}
+
+  .scatter-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .scatter-box{border:1px solid var(--rule);border-radius:4px;background:var(--paper-2);
+               padding:18px 18px 10px}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  .axis-line{stroke:var(--rule-strong);stroke-width:1}
+  .grid-line{stroke:var(--rule);stroke-width:1;stroke-dasharray:2 4}
+  .axis-label{font-family:var(--mono);font-size:10px;fill:var(--ink-faint)}
+  .axis-title{font-family:var(--mono);font-size:11px;letter-spacing:.05em;fill:var(--ink-soft);
+              text-transform:uppercase}
+  .pt{fill:var(--measured)}
+  .pt.reference{fill:var(--reference)}
+  .pt.legacy{fill:var(--legacy)}
+  .pt-label{font-family:var(--mono);font-size:11px;fill:var(--ink);font-weight:600}
+  .pt-sub{font-family:var(--mono);font-size:9.5px;fill:var(--ink-faint)}
+
+  footer{padding:44px 0 68px}
+  footer .cols{display:flex;flex-wrap:wrap;gap:44px;justify-content:space-between}
+  footer p{font-size:13px;color:var(--ink-faint);max-width:54ch}
+  footer .method{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);line-height:1.95}
+  footer code{font-family:var(--mono);font-size:11.5px}
+
+  @media (max-width:860px){.scatter-grid{grid-template-columns:1fr}}
+  @media (max-width:720px){.wrap{padding:0 20px}.nav{display:none}.hero-meta{gap:20px}}
 </style>
-</head><body><main>
-  <h1>Cortex-Bench leaderboard</h1>
-  <p class="tagline">Text-to-SQL over a 22-table, 63-million-row synthetic Indian wealth-management
-  warehouse. 200 questions across 9 tiers, 190 execution-scored.</p>
+<script>
+function toggleTheme(){
+  var r=document.documentElement, d=r.getAttribute('data-theme')==='dark';
+  r.setAttribute('data-theme', d?'light':'dark');
+  document.getElementById('themeBtn').textContent = d?'Dark':'Light';
+  try{localStorage.setItem('cb-theme', d?'light':'dark')}catch(e){}
+}
+(function(){
+  var t=null; try{t=localStorage.getItem('cb-theme')}catch(e){}
+  if(!t && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) t='dark';
+  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');
+    document.addEventListener('DOMContentLoaded',function(){
+      document.getElementById('themeBtn').textContent='Light';});}
+})();
+</script>
+</head>
+<body>
 
-  <div class="note"><strong>Every score here is a mean over repeated runs, and the spread is
-  printed next to it.</strong> We measured two identical runs of the same agent &mdash; same model,
-  same questions, temperature&nbsp;0 &mdash; disagreeing on 21% of tasks. A single-run leaderboard
-  number implies a precision that does not exist, so three runs are mandatory and every run's score
-  is published in the entry file.</div>
+<div class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand"><span class="mark">Cortex&#8209;Bench</span><span class="sub">Neosapients</span></div>
+    <nav class="nav">
+      <a href="#leaderboard">Leaderboard</a>
+      <a href="#breakdown">By tier</a>
+      <a href="#efficiency">Cost &amp; latency</a>
+      <a href="#method">Method</a>
+      <a href="https://github.com/jjayeshneo/Cortex-Benchmark">Repository</a>
+    </nav>
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">Dark</button>
+  </div>
+</div>
 
-  <h2>Snapshot <code>wm_synthetic_v1.3_2026_09_01</code></h2>
-  <p class="legend">Gold answers are bound to the data snapshot; entries scored against different
-  snapshots are listed under separate headings and must not be compared. Here, all rows scored over 190 gradable tasks.</p>
-  <div class="wrap"><table>
-    <thead><tr>
-      <th>#</th><th>System</th><th>Organization</th><th>Model</th>
-      <th title="Execution accuracy: mean over all runs, with standard deviation.">EX (mean &plusmn; sd)</th>
-      <th title="Tasks passed at least once / tasks passed on every run.">pass@N / pass^N</th>
-      <th title="Tasks attempted out of the board denominator.">Coverage</th>
-      <th title="Fraction of sessions where every turn passed.">Session</th>
-      <th title="Accuracy on the 41 multi-turn tier-9 turns.">Multi&#8209;turn</th>
-      <th>USD/task</th><th>Median s</th><th>Verification</th><th>Evaluated</th>
-    </tr></thead>
-    <tbody>
-      <tr class="refrow">
-        <td class="rank">&mdash;</td>
-        <td class="sys"><strong>Null floor (answer nothing)</strong>
-            <div class="sub">1.0</div></td>
-        <td>Cortex-Bench organizers</td>
-        <td>&mdash;<div class="sub">none</div></td>
-        <td class="ex" title="single run">4.7%</td>
-        <td><span class="na">&mdash;</span></td>
-        <td>190/190</td>
-        <td><span class="na" title="not measured">&mdash;</span></td>
-        <td><span class="na" title="not measured">&mdash;</span></td>
-        <td>0.0000</td>
-        <td>0.0</td>
-        <td><span class="v-yes" title="Executed by the organizers.">&#9679; organizer-run</span></td>
-        <td class="sub">2026-09-01</td>
-      </tr>
-      <tr class="">
-        <td class="rank">1</td>
-        <td class="sys"><strong>LangChain SQL agent</strong>
-            <div class="sub">langchain create_sql_agent, default toolkit</div></td>
-        <td>Cortex-Bench organizers (reference implementation)</td>
-        <td>gpt-5.6-luna<div class="sub">api</div></td>
-        <td class="ex" title="53.7%, 51.6%, 54.7%">53.3% <span class="pm">&plusmn;1.6</span></td>
-        <td><span title="Passed at least once: 117. Passed every run: 86. 31 tasks flipped verdict between identical runs.">117 / 86</span></td>
-        <td><span class="warn" title="Did not attempt 41 tasks; they are scored as failures.">149/190</span></td>
-        <td>64.5% <span class="pm">&plusmn;1.9</span></td>
-        <td>0.0%</td>
-        <td>0.0049</td>
-        <td>20.4</td>
-        <td><span class="v-yes" title="Executed by the organizers.">&#9679; organizer-run</span></td>
-        <td class="sub">2026-09-01</td>
-      </tr>
-    </tbody>
-  </table></div>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Enterprise text-to-SQL &middot; snapshot wm_synthetic_v1.3_2026_09_01</div>
+    <h1>How accurately do data agents answer real wealth-management questions?</h1>
+    <p>Cortex-Bench scores agents on 190 questions against a 22-table, 58-million-row synthetic
+       Indian wealth-management warehouse. Nine tiers, from schema linking to multi-turn sessions,
+       including a tier whose correct answer is that the question cannot be answered from the data.
+       Every row below was executed by the organizers, and every score is a mean over repeated runs.</p>
+    <div class="hero-meta">
+      <div class="hero-stat"><div class="n">190</div><div class="l">Scored tasks</div></div>
+      <div class="hero-stat"><div class="n">3&times;</div><div class="l">Runs per task</div></div>
+      <div class="hero-stat"><div class="n">22</div><div class="l">Tables &middot; 58.5M rows</div></div>
+      <div class="hero-stat"><div class="n">9</div><div class="l">Difficulty tiers</div></div>
+    </div>
+  </div>
+</header>
 
-  <h2>By tier</h2>
-  <table class="tiers">
-    <thead><tr><th>System</th><th title="Schema linking">T1</th><th title="Single-table filter">T2</th><th title="Joins">T3</th><th title="Aggregation">T4</th><th title="Window / ranking">T5</th><th title="Domain computation">T6</th><th title="Unanswerable / null-result">T7</th><th title="Multi-turn session">T9</th></tr></thead>
-    <tbody>
-      <tr><td class="sys">Null floor (answer nothing)</td><td class="hot">0</td><td class="hot">0</td><td class="hot">0</td><td class="hot">0</td><td class="hot">0</td><td class="hot">0</td><td class="">90</td><td class="hot">0</td></tr>
-      <tr><td class="sys">LangChain SQL agent</td><td class="">79</td><td class="">87</td><td class="">84</td><td class="">79</td><td class="">76</td><td class="hot">27</td><td class="hot">23</td><td class="hot">0</td></tr>
-    </tbody>
-  </table>
-  <p class="legend">T1 Schema linking &middot; T2 Single-table filter &middot; T3 Joins &middot; T4 Aggregation &middot; T5 Window / ranking &middot; T6 Domain computation &middot; T7 Unanswerable / null-result &middot; T9 Multi-turn session. Values are % correct, averaged over all runs.</p>
+<section id="leaderboard">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Leaderboard</h2></div>
+    <p class="sec-desc">Ranked by <strong>execution accuracy</strong> &mdash; the mean over every run,
+       with the standard deviation beside it. The denominator is always 190: a system that does not
+       attempt a task is scored as failing it, and the coverage column shows what it skipped.
+       Skipping work must never raise a score.</p>
 
-  <h2>How to read this board</h2>
-  <ul>
-    <li><strong>The denominator never changes.</strong> A system that attempts 149 of 190 tasks is
-      scored out of 190; the skipped tasks count as failures and the coverage column says so.
-      Skipping work must not raise a score.</li>
-    <li><strong>pass@N / pass^N</strong> is the honest measure of stability: how many tasks the
-      system got right at least once, versus on every single run. The gap is churn.</li>
-    <li><strong>The null floor is a row, not a footnote.</strong> It answers nothing at all. Any
-      system that does not clearly beat it has told you nothing.</li>
-    <li><strong>A dash is not a zero.</strong> Hover it for why the metric was not measured.</li>
-  </ul>
+    <div class="controls">
+      <div class="legend">
+        <span class="k"><span class="dot" style="background:var(--measured)"></span>Measured &mdash; ranked, current snapshot</span>
+        <span class="k"><span class="dot" style="background:var(--reference)"></span>Reference &mdash; control, not a competitor</span>
+        <span class="k"><span class="dot" style="background:var(--legacy)"></span>Legacy &mdash; older snapshot, unranked</span>
+      </div>
+    </div>
 
-  <h2>Not on this board yet</h2>
-  <ul>
-    <li><strong>Human baseline.</strong> Not yet run. Until it exists the board has no ceiling, and
-      no reader can tell whether 53% is close to the limit or nowhere near it.</li>
-    <li><strong>Single-call schema-only baseline.</strong> Not yet run.</li>
-    <li><strong>Our own agent.</strong> Its captured runs predate the v1.2 data repair and its
-      emitted SQL is not re-executable, so it has no honest score on this snapshot. It will appear
-      when it has been re-run, through the same path as every other entry.</li>
-  </ul>
+    <div class="board-scroll">
+    <table class="board">
+      <thead>
+        <tr>
+          <th style="width:34px">#</th>
+          <th>System</th>
+          <th>Band</th>
+          <th class="num">Execution accuracy</th>
+          <th class="num" title="Tasks passed at least once / passed on every run.">pass@N / pass^N</th>
+          <th class="num">Coverage</th>
+          <th class="num">Latency</th>
+          <th class="num">Cost/task</th>
+          <th class="num">Snapshot</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="reference">
+          <td class="rank">&mdash;</td>
+          <td>
+            <div class="agent-cell">
+              <span class="band-tick reference"></span>
+              <div>
+                <div class="agent-name">Null floor (answer nothing)</div>
+                <div class="agent-arch">no model &middot; no data read</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="band-pill reference">Reference</span></td>
+          <td class="num" title="single run">
+            <div class="score-cell">
+              <span class="bar"><span class="" style="width:8.9%"></span></span>
+              <span class="score-num">4.7%</span>
+            </div>
+          </td>
+          <td class="num sub-num"><span class="na" title="not measured">&mdash;</span> / <span class="na" title="not measured">&mdash;</span></td>
+          <td class="num sub-num">190/190</td>
+          <td class="num sub-num">0.0s</td>
+          <td class="num sub-num">$0.0000</td>
+          <td class="num sub-num">v1.3</td>
+        </tr>
+        <tr class="measured">
+          <td class="rank top">1</td>
+          <td>
+            <div class="agent-cell">
+              <span class="band-tick measured"></span>
+              <div>
+                <div class="agent-name">LangChain SQL agent</div>
+                <div class="agent-arch">gpt-5.6-luna &middot; langchain create_sql_agent, default toolkit</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="band-pill measured">Measured</span></td>
+          <td class="num" title="runs: 53.7%, 51.6%, 54.7%">
+            <div class="score-cell">
+              <span class="bar"><span class="lead" style="width:100.0%"></span></span>
+              <span class="score-num lead">53.3%<span class="pm"> &plusmn;1.6</span></span>
+            </div>
+          </td>
+          <td class="num sub-num">117 / 86</td>
+          <td class="num sub-num"><span class="warn" title="Did not attempt 41 of 190 tasks; they are scored as failures.">149/190</span></td>
+          <td class="num sub-num">20.4s</td>
+          <td class="num sub-num">$0.0049</td>
+          <td class="num sub-num">v1.3</td>
+        </tr>
+        <tr class="legacy">
+          <td class="rank">&mdash;</td>
+          <td>
+            <div class="agent-cell">
+              <span class="band-tick legacy"></span>
+              <div>
+                <div class="agent-name">Neo-Cortex</div>
+                <div class="agent-arch">context-layer agent</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="band-pill legacy">Legacy</span></td>
+          <td class="num" title="single run">
+            <div class="score-cell">
+              <span class="bar"><span class="" style="width:69.1%"></span></span>
+              <span class="score-num">36.8%</span>
+            </div>
+          </td>
+          <td class="num sub-num"><span class="na" title="One run only. pass@N and pass^N need at least two.">&mdash;</span> / <span class="na" title="One run only. pass@N and pass^N need at least two.">&mdash;</span></td>
+          <td class="num sub-num"><span class="warn" title="Did not attempt 41 of 190 tasks; they are scored as failures.">149/190</span></td>
+          <td class="num sub-num">21.7s</td>
+          <td class="num sub-num"><span class="na" title="Per-task cost was not recorded during this run.">&mdash;</span></td>
+          <td class="num sub-num">v1.1</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+      <p class="note"><strong>Null floor (answer nothing)</strong> is a control, not a competitor: it returns the empty set for every task, reads no data and calls no model. It scores 4.7% because some questions in this benchmark genuinely have no rows to return. Read every other score against it.</p>
+      <p class="note"><strong>Why the spread is printed.</strong> Two identical runs of the same agent
+      &mdash; same model, same questions, temperature&nbsp;0 &mdash; disagreed on 21% of tasks.
+      A single-run number implies a precision that does not exist, so three runs are required and
+      every run's score is published in the entry file. <b>pass@N</b> counts tasks solved at least
+      once; <b>pass^N</b> counts tasks solved every time. The gap between them is churn.</p>
+      <p class="note"><strong>Neo-Cortex</strong> carries a <b>Legacy</b> pill because it was measured against an earlier data snapshot. Gold answers are bound to the snapshot they were compiled from, so that figure is real but not comparable with the ranked rows, and it takes no rank. Its captured SQL cannot be re-executed either &mdash; the agent emitted parameterised SQL whose bound values were never recorded &mdash; so a comparable number needs the agent re-run, not the capture re-scored.</p>
+      <p class="note">A dash is not a zero. Hover it to see why the metric was not measured.</p>
+  </div>
+</section>
 
-  <h2>Submitting</h2>
-  <p>Add one JSON file to <code>results/</code>, named for its <code>entry_id</code>, and open a
-  pull request. CI validates it against <code>schema/leaderboard_entry.schema.json</code> and
-  rebuilds this page on merge. Run
-  <code>python3 leaderboard/validate_entry.py results/your-entry.json</code> first.</p>
+<section id="breakdown">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Accuracy by difficulty tier</h2></div>
+    <p class="sec-desc">Where each system actually loses. Tiers 1&ndash;2 are lookups and filters,
+       3&ndash;5 add joins, aggregation and window functions, 6 requires applying Indian market and
+       taxation rules, 7 asks questions the data cannot answer, and 9 is multi-turn. Darker cells are
+       stronger.</p>
+    <div class="grid-scroll">
+      <table class="breakdown">
+        <thead><tr><th>System</th><th class="num" title="Schema linking">T1</th><th class="num" title="Single-table filter">T2</th><th class="num" title="Joins">T3</th><th class="num" title="Aggregation">T4</th><th class="num" title="Window / ranking">T5</th><th class="num" title="Domain computation">T6</th><th class="num" title="Unanswerable / null-result">T7</th><th class="num" title="Multi-turn session">T9</th></tr></thead>
+        <tbody>
+        <tr><td>Null floor (answer nothing)</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 37%, transparent)">90</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0</span></td></tr>
+        <tr><td>LangChain SQL agent</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 33%, transparent)">79</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">87</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 34%, transparent)">84</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 33%, transparent)">79</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 32%, transparent)">76</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 15%, transparent)">27</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">23</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0</span></td></tr>
+        <tr><td>Neo-Cortex</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">86</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 33%, transparent)">80</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 23%, transparent)">49</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 24%, transparent)">54</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 8%, transparent)">7</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 37%, transparent)">90</span></td><td class="num na">&mdash;</td></tr>
+        </tbody>
+      </table>
+      <p class="note"><b>T1</b> Schema linking &middot; <b>T2</b> Single-table filter &middot; <b>T3</b> Joins &middot; <b>T4</b> Aggregation &middot; <b>T5</b> Window / ranking &middot; <b>T6</b> Domain computation &middot; <b>T7</b> Unanswerable / null-result &middot; <b>T9</b> Multi-turn session. Values are % of tasks passed, averaged over every run.</p>
+    </div>
+    <p class="note">Tier 8 is excluded from every figure on this page: those ten tasks are graded
+       against a rubric and the judge is not implemented, so they are neither passes nor failures.</p>
+  </div>
+</section>
 
-  <footer>
-    Built 2026-09-01 13:45 UTC from 2 entries in
-    <code>results/</code>. This page is generated &mdash; edit the JSON, never the HTML.
-    Provenance for any row: <code>git log results/&lt;entry-id&gt;.json</code>.
-  </footer>
-</main></body></html>
+<section id="efficiency">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Cost and latency against accuracy</h2></div>
+    <p class="sec-desc">What each system spends to get where it got. Accuracy runs along the
+       horizontal axis, so <strong>bottom-right is best</strong>: accurate and cheap, accurate and
+       fast. Correctness alone is not the whole picture on a 58-million-row database &mdash; a query
+       that returns the right answer in six minutes is not a usable one.</p>
+    <div class="scatter-grid">
+<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="USD per task against execution accuracy"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0.0000</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">0.0015</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">0.0030</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">0.0046</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">0.0061</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">16%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">32%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">48%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">64%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Execution accuracy</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">USD per task</text><circle class="pt measured" cx="623.7" cy="85.6" r="6.5"/><text class="pt-label" x="612.7" y="83.6" text-anchor="end">LangChain SQL agent</text><text class="pt-sub" x="612.7" y="96.6" text-anchor="end">53.3% &middot; 0.0049</text><circle class="pt reference" cx="111.9" cy="348.0" r="6.5"/><text class="pt-label" x="122.9" y="346.0" text-anchor="start">Null floor (answer nothing)</text><text class="pt-sub" x="122.9" y="359.0" text-anchor="start">4.7% &middot; 0.0000</text></svg></div>
+<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="Median seconds against execution accuracy"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">7</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">14</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">20</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">27</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">16%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">32%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">48%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">64%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Execution accuracy</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">Median seconds</text><circle class="pt legacy" cx="450.0" cy="85.6" r="6.5"/><text class="pt-label" x="461.0" y="83.6" text-anchor="start">Neo-Cortex</text><text class="pt-sub" x="461.0" y="96.6" text-anchor="start">36.8% &middot; 22</text><circle class="pt measured" cx="623.7" cy="101.3" r="6.5"/><text class="pt-label" x="612.7" y="99.3" text-anchor="end">LangChain SQL agent</text><text class="pt-sub" x="612.7" y="112.3" text-anchor="end">53.3% &middot; 20</text><circle class="pt reference" cx="111.9" cy="348.0" r="6.5"/><text class="pt-label" x="122.9" y="346.0" text-anchor="start">Null floor (answer nothing)</text><text class="pt-sub" x="122.9" y="359.0" text-anchor="start">4.7% &middot; 0</text></svg></div>
+    </div>
+    <p class="note">Latency and cost come from the live agent runs. Neither is currently folded into
+       the score: an efficiency metric in the spirit of BIRD's VES is on the roadmap, and until it
+       exists a slow correct answer ranks exactly like a fast one.</p>
+  </div>
+</section>
+
+<footer id="method">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Method, in brief</h2></div>
+    <div class="cols">
+      <p class="method">
+        190 execution-scored questions, 9 tiers, one frozen snapshot.<br>
+        Gold answers compiled by executing reference SQL against that snapshot.<br>
+        Synthetic data: deterministic, seed 42, FK-integrity validated, no PII.<br>
+        Scored by <code>eval/score_cortex_bench.py</code>, unmodified, by the organizers.<br>
+        Every run's score published, including the bad ones.
+      </p>
+      <p>
+        Each row on this board is a JSON file in <code>results/</code>, validated in CI against
+        <code>schema/leaderboard_entry.schema.json</code>. This page is regenerated from those files
+        and holds no data of its own &mdash; edit the JSON, never the HTML. The provenance of any
+        number is <code>git log results/&lt;entry-id&gt;.json</code>.
+        <br><br>
+        To submit, open a pull request adding one entry file.
+        Known defects are logged in <a href="https://github.com/jjayeshneo/Cortex-Benchmark/blob/main/ERRATA.md">ERRATA.md</a>, and what
+        the data does and does not model is in
+        <a href="https://github.com/jjayeshneo/Cortex-Benchmark/blob/main/DATASHEET.md">DATASHEET.md</a>.
+        <br><br>
+        <span class="tag">Built 2026-09-01 13:53 UTC from 3 entries.</span>
+      </p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+{
+  "entry_id": "2026-08-17-neo-cortex",
+  "system": {
+    "name": "Neo-Cortex",
+    "version": "context-layer agent",
+    "organization": "Neosapients",
+    "url": null,
+    "paper": null,
+    "code": null,
+    "open_source": false,
+    "kind": "agent"
+  },
+  "model": {
+    "name": null,
+    "provider": null,
+    "access": "api",
+    "training_cutoff": null,
+    "temperature": null,
+    "controlled": false
+  },
+  "protocol": {
+    "split": "full",
+    "corpus_version": "v1.1",
+    "data_snapshot_id": "wm_synthetic_v1.1_2026_06_24",
+    "scorer_version": "cortex_scorer_v1.6",
+    "runs": 1,
+    "denominator": 190,
+    "attempted": 149,
+    "evidence_provided": true,
+    "verified_by_organizers": true,
+    "evaluated_at": "2026-08-17T13:02:49Z"
+  },
+  "results": {
+    "execution_accuracy": {
+      "mean": 0.368421,
+      "n": 70
+    },
+    "session_accuracy": {
+      "mean": null,
+      "unavailable_reason": "Single-turn run only; no multi-turn sessions were attempted."
+    },
+    "multi_turn_turn_accuracy": {
+      "mean": 0.0
+    },
+    "pass_any": {
+      "mean": null,
+      "unavailable_reason": "One run only. pass@N and pass^N need at least two."
+    },
+    "pass_all": {
+      "mean": null,
+      "unavailable_reason": "One run only. pass@N and pass^N need at least two."
+    },
+    "cost_usd_per_task": {
+      "mean": null,
+      "unavailable_reason": "Per-task cost was not recorded during this run."
+    },
+    "median_latency_s": {
+      "mean": 21.7
+    },
+    "by_tier": {
+      "1": 0.8571,
+      "2": 0.8,
+      "3": 0.4857,
+      "4": 0.5429,
+      "5": 0.0667,
+      "6": 0.0,
+      "7": 0.9
+    }
+  },
+  "declarations": {
+    "canary_check": "not-applicable",
+    "test_data_seen": false,
+    "human_in_loop": false,
+    "artifacts": "runs/final149/ (organizer-side)",
+    "notes": "Scored against the v1.1 snapshot, so it is NOT comparable with the v1.3 rows and is not ranked against them. Its captured SQL cannot be replayed: the agent emits parameterised SQL (:p0 placeholders) and the bound values were never recorded, so 148 of 149 queries fail to parse outside the original session. A comparable number therefore requires re-running the agent, not re-scoring the capture. Single-turn only: the 41 multi-turn turns were not attempted and count as failures, so 70/190 here is 36.8% where the 149-task subset figure is 47.0%."
+  }
+}

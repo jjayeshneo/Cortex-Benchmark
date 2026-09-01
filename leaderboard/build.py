@@ -4,14 +4,21 @@
 The JSON files in results/ are the source of truth; this page is a disposable artifact. Losing
 the site loses nothing, and every row's provenance is `git log results/<entry-id>.json`.
 
-Three display rules, each one a deliberate defence against a way leaderboards mislead:
+Design direction: a measurement instrument, not a dashboard. Ink on warm paper, serif headings,
+monospace for every figure so numbers align like a financial tape, and one teal accent used only
+to mark a leading value. The page is generated whole from Python -- the only JavaScript is the
+theme toggle, so the numbers are in the HTML and remain readable with scripting off.
 
-  1. Rank by mean over N runs and always print the spread. Two identical runs of the same agent
-     at temperature 0 disagreed on 21% of this benchmark's tasks; a single number implies a
-     precision that does not exist.
+Four display rules, each a defence against a way leaderboards mislead:
+
+  1. Rank by mean over N runs and always print the spread. Two identical runs of the same agent at
+     temperature 0 disagreed on 21% of this benchmark's tasks; one number implies a precision that
+     does not exist.
   2. One denominator for the whole board. A system that skips tasks is scored on all of them, and
      the coverage column shows what it skipped. Skipping must never raise a score.
-  3. Unmeasured is not zero. A metric with no measurement renders as a dash carrying the reason.
+  3. Snapshots never mix in a ranking. Gold answers are snapshot-bound, so a row measured against
+     an older snapshot is shown, marked, and left unranked.
+  4. Unmeasured is not zero. A metric with no measurement renders as a dash carrying its reason.
 
     python3 leaderboard/build.py [--out docs/index.html] [--check]
 """
@@ -29,8 +36,8 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 from validate_entry import check_file  # noqa: E402
 
-# The only absolute URL the generated page emits. The Pages site is served from docs/, so a
-# relative link to a file at the repo root would 404 for every visitor.
+# The only absolute URL the generated page emits. Pages serves from docs/, so a relative link to a
+# file at the repo root would 404 for every visitor.
 REPO_URL = "https://github.com/jjayeshneo/Cortex-Benchmark"
 
 TIER_NAMES = {
@@ -39,6 +46,14 @@ TIER_NAMES = {
     8: "Open analysis (rubric)", 9: "Multi-turn session",
 }
 
+BANDS = {
+    "measured":  ("Measured",  "Organizer-run against the current snapshot, and ranked."),
+    "reference": ("Reference", "A control, not a competitor. Pinned above the ranking."),
+    "legacy":    ("Legacy",    "Measured against an older snapshot. Shown, not ranked."),
+}
+
+
+# ----------------------------------------------------------------------------- data
 
 def load_entries() -> list:
     d = os.path.join(ROOT, "results")
@@ -60,226 +75,522 @@ def load_entries() -> list:
     return out
 
 
-def pct(m, digits: int = 1) -> str:
+def current_snapshot(entries: list) -> str:
+    """The snapshot the board ranks on: the highest snapshot id present.
+
+    Snapshot ids sort chronologically by construction (wm_synthetic_v1.3_2026_09_01), so this needs
+    no separate config that could drift out of date.
+    """
+    return max(e["protocol"]["data_snapshot_id"] for e in entries)
+
+
+def band_of(entry: dict, snap: str) -> str:
+    if entry["system"].get("kind") == "reference":
+        return "reference"
+    return "measured" if entry["protocol"]["data_snapshot_id"] == snap else "legacy"
+
+
+def ex(entry: dict) -> float:
+    return entry["results"]["execution_accuracy"].get("mean") or 0.0
+
+
+# ----------------------------------------------------------------------------- formatting
+
+def pct(m, digits: int = 1, dash: str = "&mdash;") -> str:
     if not m or m.get("mean") is None:
         reason = (m or {}).get("unavailable_reason") or "not measured"
-        return f'<span class="na" title="{html.escape(reason)}">&mdash;</span>'
+        return f'<span class="na" title="{html.escape(reason)}">{dash}</span>'
     s = f'{100 * m["mean"]:.{digits}f}%'
     if m.get("std") is not None:
-        s += f' <span class="pm">&plusmn;{100 * m["std"]:.1f}</span>'
+        s += f'<span class="pm"> &plusmn;{100 * m["std"]:.1f}</span>'
     return s
 
 
-def num(m, fmt: str) -> str:
+def num(m, fmt: str, prefix: str = "", suffix: str = "") -> str:
     if not m or m.get("mean") is None:
         reason = (m or {}).get("unavailable_reason") or "not measured"
         return f'<span class="na" title="{html.escape(reason)}">&mdash;</span>'
-    return format(m["mean"], fmt)
+    return f'{prefix}{format(m["mean"], fmt)}{suffix}'
 
 
-def link(text: str, url) -> str:
-    t = html.escape(text)
-    return f'<a href="{html.escape(url)}" rel="noopener">{t}</a>' if url else t
+def count(m) -> str:
+    if not m or m.get("n") is None:
+        reason = (m or {}).get("unavailable_reason") or "not measured"
+        return f'<span class="na" title="{html.escape(reason)}">&mdash;</span>'
+    return str(m["n"])
 
 
-def row_html(e: dict, rank: str) -> str:
-    s, mo, p, r = e["system"], e["model"], e["protocol"], e["results"]
-    ref = s.get("kind") == "reference"
-    ex = r.get("execution_accuracy", {})
-    runs = ex.get("runs")
-    runs_title = (", ".join(f"{100*v:.1f}%" for v in runs)) if runs else "single run"
-    att, den = p.get("attempted"), p["denominator"]
-    if att is not None and att < den:
-        cov = (f'<span class="warn" title="Did not attempt {den-att} tasks; '
-               f'they are scored as failures.">{att}/{den}</span>')
-    else:
-        cov = f'{att if att is not None else den}/{den}'
-    pa, pl = r.get("pass_any"), r.get("pass_all")
-    if pa and pl and pa.get("n") is not None:
-        flip = pa["n"] - pl["n"]
-        stab = (f'<span title="Passed at least once: {pa["n"]}. Passed every run: {pl["n"]}. '
-                f'{flip} tasks flipped verdict between identical runs.">'
-                f'{pa["n"]} / {pl["n"]}</span>')
-    else:
-        stab = '<span class="na">&mdash;</span>'
-    badge = ('<span class="v-yes" title="Executed by the organizers.">&#9679; organizer-run</span>'
-             if p.get("verified_by_organizers")
-             else '<span class="v-no" title="Self-reported by the submitter.">&#9675; self-reported</span>')
-    model_name = html.escape(mo["name"]) if mo.get("name") else "&mdash;"
-    return f"""      <tr class="{'refrow' if ref else ''}">
-        <td class="rank">{rank}</td>
-        <td class="sys"><strong>{link(s['name'], s.get('url'))}</strong>
-            <div class="sub">{html.escape(s.get('version') or '')}</div></td>
-        <td>{html.escape(s['organization'])}</td>
-        <td>{model_name}<div class="sub">{html.escape(mo['access'])}</div></td>
-        <td class="ex" title="{runs_title}">{pct(ex)}</td>
-        <td>{stab}</td>
-        <td>{cov}</td>
-        <td>{pct(r.get('session_accuracy'))}</td>
-        <td>{pct(r.get('multi_turn_turn_accuracy'))}</td>
-        <td>{num(r.get('cost_usd_per_task'), '.4f')}</td>
-        <td>{num(r.get('median_latency_s'), '.1f')}</td>
-        <td>{badge}</td>
-        <td class="sub">{html.escape(p['evaluated_at'][:10])}</td>
-      </tr>"""
+# ----------------------------------------------------------------------------- sections
 
+def board_rows(entries: list, snap: str) -> str:
+    refs = [e for e in entries if band_of(e, snap) == "reference"]
+    ranked = sorted([e for e in entries if band_of(e, snap) == "measured"], key=ex, reverse=True)
+    legacy = sorted([e for e in entries if band_of(e, snap) == "legacy"], key=ex, reverse=True)
+    best = max([ex(e) for e in ranked], default=0.0)
+    scale = max([ex(e) for e in entries] + [0.01])
 
-def tier_table(entries: list) -> str:
-    tiers = sorted({int(t) for e in entries for t in (e["results"].get("by_tier") or {})})
-    head = "".join(f'<th title="{html.escape(TIER_NAMES.get(t, ""))}">T{t}</th>' for t in tiers)
     rows = []
-    for e in entries:
+    for i, e in enumerate(refs + ranked + legacy):
+        band = band_of(e, snap)
+        rank = str(ranked.index(e) + 1) if band == "measured" else "&mdash;"
+        s, p, r = e["system"], e["protocol"], e["results"]
+        lead = band == "measured" and abs(ex(e) - best) < 1e-9
+        width = 100 * ex(e) / scale
+        att, den = p.get("attempted"), p["denominator"]
+        cov = (f'<span class="warn" title="Did not attempt {den - att} of {den} tasks; '
+               f'they are scored as failures.">{att}/{den}</span>'
+               if att is not None and att < den else f'{att if att is not None else den}/{den}')
+        # The sub-line describes what the row IS. A bare version string like "1.0" tells a reader
+        # nothing, so it is only shown when it is descriptive.
+        ver = (s.get("version") or "").strip()
+        if e["model"].get("name"):
+            model = f'{html.escape(e["model"]["name"])}'
+            if ver and not ver.replace(".", "").isdigit():
+                model += f' &middot; {html.escape(ver)}'
+        elif ver and not ver.replace(".", "").isdigit():
+            model = html.escape(ver)
+        else:
+            model = "no model &middot; no data read" if band == "reference" else "model not recorded"
+        runs = r["execution_accuracy"].get("runs")
+        title = ("runs: " + ", ".join(f"{100*v:.1f}%" for v in runs)) if runs else "single run"
+        rows.append(f"""        <tr class="{band}">
+          <td class="rank{' top' if lead else ''}">{rank}</td>
+          <td>
+            <div class="agent-cell">
+              <span class="band-tick {band}"></span>
+              <div>
+                <div class="agent-name">{html.escape(s['name'])}</div>
+                <div class="agent-arch">{model}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="band-pill {band}">{BANDS[band][0]}</span></td>
+          <td class="num" title="{title}">
+            <div class="score-cell">
+              <span class="bar"><span class="{'lead' if lead else ''}" style="width:{width:.1f}%"></span></span>
+              <span class="score-num{' lead' if lead else ''}">{pct(r['execution_accuracy'])}</span>
+            </div>
+          </td>
+          <td class="num sub-num">{count(r.get('pass_any'))} / {count(r.get('pass_all'))}</td>
+          <td class="num sub-num">{cov}</td>
+          <td class="num sub-num">{num(r.get('median_latency_s'), '.1f', suffix='s')}</td>
+          <td class="num sub-num">{num(r.get('cost_usd_per_task'), '.4f', prefix='$')}</td>
+          <td class="num sub-num">{html.escape(p['data_snapshot_id'].split('_')[2])}</td>
+        </tr>""")
+    return "\n".join(rows)
+
+
+def tier_table(entries: list, snap: str) -> str:
+    order = ({"reference": 0, "measured": 1, "legacy": 2})
+    ents = sorted(entries, key=lambda e: (order[band_of(e, snap)], -ex(e)))
+    tiers = sorted({int(t) for e in ents for t in (e["results"].get("by_tier") or {})})
+    head = "".join(
+        f'<th class="num" title="{html.escape(TIER_NAMES.get(t, ""))}">T{t}</th>' for t in tiers)
+    rows = []
+    for e in ents:
         bt = e["results"].get("by_tier") or {}
         cells = []
         for t in tiers:
             v = bt.get(str(t))
-            cells.append('<td class="na">&mdash;</td>' if v is None
-                         else f'<td class="{"hot" if v < 0.35 else ""}">{100*v:.0f}</td>')
-        rows.append(f'      <tr><td class="sys">{html.escape(e["system"]["name"])}</td>'
+            if v is None:
+                cells.append('<td class="num na">&mdash;</td>')
+                continue
+            # heat is a tint of the accent, proportional to the value -- readable in both themes
+            cells.append(f'<td class="num"><span class="heat" style="background:'
+                         f'color-mix(in srgb, var(--accent) {6 + 34 * v:.0f}%, transparent)">'
+                         f'{100 * v:.0f}</span></td>')
+        rows.append(f'        <tr><td>{html.escape(e["system"]["name"])}</td>'
                     + "".join(cells) + "</tr>")
-    legend = " &middot; ".join(f"T{t} {html.escape(TIER_NAMES.get(t, '?'))}" for t in tiers)
-    return f"""  <table class="tiers">
-    <thead><tr><th>System</th>{head}</tr></thead>
-    <tbody>
+    legend = " &middot; ".join(f"<b>T{t}</b> {html.escape(TIER_NAMES.get(t, '?'))}" for t in tiers)
+    return f"""      <table class="breakdown">
+        <thead><tr><th>System</th>{head}</tr></thead>
+        <tbody>
 {chr(10).join(rows)}
-    </tbody>
-  </table>
-  <p class="legend">{legend}. Values are % correct, averaged over all runs.</p>"""
+        </tbody>
+      </table>
+      <p class="note">{legend}. Values are % of tasks passed, averaged over every run.</p>"""
+
+
+def scatter(entries: list, snap: str, metric: str, y_title: str, fmt: str) -> str:
+    """Accuracy against cost or latency. Bottom-right is best."""
+    pts = [(e, e["results"].get(metric, {}).get("mean")) for e in entries]
+    pts = [(e, y) for e, y in pts if y is not None and ex(e) > 0]
+    if not pts:
+        return ('<p class="note">No system has published this metric yet, so there is nothing to '
+                'plot. An unmeasured metric is left blank rather than drawn as a zero.</p>')
+    W, H, L, R, T, B = 760, 400, 62, 24, 20, 52
+    ymax = max(y for _, y in pts) * 1.25 or 1.0
+    xmax = max(ex(e) for e, _ in pts) * 1.20 or 1.0
+
+    def sx(v): return L + (W - L - R) * (v / xmax)
+    def sy(v): return H - B - (H - T - B) * (v / ymax)
+
+    g = [f'<line class="axis-line" x1="{L}" y1="{H-B}" x2="{W-R}" y2="{H-B}"/>',
+         f'<line class="axis-line" x1="{L}" y1="{T}" x2="{L}" y2="{H-B}"/>']
+    for i in range(5):
+        yv = ymax * i / 4
+        y = sy(yv)
+        if i:
+            g.append(f'<line class="grid-line" x1="{L}" y1="{y:.1f}" x2="{W-R}" y2="{y:.1f}"/>')
+        g.append(f'<text class="axis-label" x="{L-10}" y="{y+4:.1f}" text-anchor="end">'
+                 f'{format(yv, fmt)}</text>')
+    for i in range(5):
+        xv = xmax * i / 4
+        x = sx(xv)
+        g.append(f'<text class="axis-label" x="{x:.1f}" y="{H-B+18}" text-anchor="middle">'
+                 f'{100*xv:.0f}%</text>')
+    g.append(f'<text class="axis-title" x="{(L+W-R)/2:.0f}" y="{H-B+40}" text-anchor="middle">'
+             f'Execution accuracy</text>')
+    g.append(f'<text class="axis-title" x="-{(T+H-B)/2:.0f}" y="16" transform="rotate(-90)" '
+             f'text-anchor="middle">{html.escape(y_title)}</text>')
+    for e, y in sorted(pts, key=lambda p: -p[1]):
+        band = band_of(e, snap)
+        cx, cy = sx(ex(e)), sy(y)
+        g.append(f'<circle class="pt {band}" cx="{cx:.1f}" cy="{cy:.1f}" r="6.5"/>')
+        anchor = "end" if cx > (W - R) * 0.72 else "start"
+        dx = -11 if anchor == "end" else 11
+        g.append(f'<text class="pt-label" x="{cx+dx:.1f}" y="{cy-2:.1f}" text-anchor="{anchor}">'
+                 f'{html.escape(e["system"]["name"])}</text>')
+        g.append(f'<text class="pt-sub" x="{cx+dx:.1f}" y="{cy+11:.1f}" text-anchor="{anchor}">'
+                 f'{100*ex(e):.1f}% &middot; {format(y, fmt)}</text>')
+    return (f'<div class="scatter-box"><svg viewBox="0 0 {W} {H}" role="img" '
+            f'aria-label="{html.escape(y_title)} against execution accuracy">'
+            + "".join(g) + "</svg></div>")
 
 
 CSS = """
-:root{--bg:#fff;--fg:#16181d;--muted:#6b7280;--line:#e5e7eb;--accent:#1d4ed8;
-      --warn:#b45309;--refbg:#f8fafc;--hot:#b91c1c}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1115;--fg:#e8eaed;--muted:#9aa3af;
-      --line:#262b33;--accent:#7aa2ff;--warn:#e0a33e;--refbg:#161a21;--hot:#f87171}}
-*{box-sizing:border-box}
-body{margin:0;padding:2.2rem 1.2rem 4rem;background:var(--bg);color:var(--fg);
-     font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-main{max-width:1180px;margin:0 auto}
-h1{font-size:1.9rem;margin:0 0 .2rem;letter-spacing:-.02em}
-h2{font-size:1.15rem;margin:2.6rem 0 .6rem;letter-spacing:-.01em}
-.tagline{color:var(--muted);margin:0 0 1.6rem}
-.wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
-table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:960px}
-th,td{padding:.6rem .7rem;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
-th{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-tbody tr:last-child td{border-bottom:none}
-td.rank{color:var(--muted);font-variant-numeric:tabular-nums}
-td.ex{font-weight:650;font-variant-numeric:tabular-nums}
-.sub{color:var(--muted);font-size:11.5px;font-weight:400;white-space:normal}
-.pm{color:var(--muted);font-weight:400}
-.na{color:var(--muted);cursor:help}
-.warn{color:var(--warn);cursor:help;font-weight:600}
-.refrow{background:var(--refbg)}
-.refrow td.sys strong{font-weight:600}
-.v-yes{color:#15803d}.v-no{color:var(--muted)}
-@media (prefers-color-scheme:dark){.v-yes{color:#4ade80}}
-.tiers{min-width:640px;border:1px solid var(--line);border-radius:10px}
-.tiers td{font-variant-numeric:tabular-nums}
-.tiers td.hot{color:var(--hot);font-weight:600}
-.legend{color:var(--muted);font-size:12px}
-.note{border-left:3px solid var(--accent);padding:.15rem 0 .15rem 1rem;margin:1rem 0;
-      color:var(--fg)}
-.note strong{font-weight:650}
-ul{padding-left:1.15rem}li{margin:.35rem 0}
-code{font:12.5px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;
-     background:var(--refbg);padding:.1rem .3rem;border-radius:4px}
-footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);
-       color:var(--muted);font-size:12.5px}
-a{color:var(--accent)}
+  :root{
+    --paper:#FBFAF7; --paper-2:#F3F1EB; --ink:#1A1D1A; --ink-soft:#5A5F57; --ink-faint:#8A8F84;
+    --rule:#DAD7CD; --rule-strong:#B9B5A8; --accent:#0F6E63; --accent-soft:#0F6E6318;
+    --measured:#2B4C6F; --reference:#8A5A2B; --legacy:#7A7468; --warn:#9A5B12;
+    --bar-track:#E4E1D8;
+    --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"SFMono-Regular",ui-monospace,"JetBrains Mono","Menlo",Consolas,monospace;
+  }
+  [data-theme="dark"]{
+    --paper:#14150F; --paper-2:#1D1F17; --ink:#EDEBE1; --ink-soft:#A9A99C; --ink-faint:#74766A;
+    --rule:#2C2E23; --rule-strong:#3D4030; --accent:#4FBFAF; --accent-soft:#4FBFAF1F;
+    --measured:#7FA8CE; --reference:#C99A5F; --legacy:#8E8878; --warn:#E0A33E;
+    --bar-track:#26281D;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;
+       -webkit-font-smoothing:antialiased;transition:background .3s ease,color .3s ease}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+  a{color:var(--accent)}
+
+  .topbar{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:50;
+          background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px)}
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{display:flex;align-items:baseline;gap:10px;font-family:var(--serif)}
+  .brand .mark{font-size:20px;font-weight:600;letter-spacing:-.01em}
+  .brand .sub{font-size:12px;color:var(--ink-faint);font-family:var(--mono);
+              text-transform:uppercase;letter-spacing:.08em}
+  .nav{display:flex;gap:26px;align-items:center}
+  .nav a{color:var(--ink-soft);text-decoration:none;font-size:13.5px}
+  .nav a:hover{color:var(--ink)}
+  .theme-btn{font-family:var(--mono);font-size:11px;letter-spacing:.06em;background:none;
+             border:1px solid var(--rule-strong);color:var(--ink-soft);padding:6px 11px;
+             border-radius:2px;cursor:pointer;text-transform:uppercase}
+  .theme-btn:hover{border-color:var(--ink-soft);color:var(--ink)}
+
+  .hero{padding:64px 0 40px;border-bottom:1px solid var(--rule)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--accent);margin-bottom:20px}
+  .hero h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,50px);line-height:1.06;
+           letter-spacing:-.02em;max-width:17ch;margin-bottom:20px}
+  .hero p{font-size:16.5px;color:var(--ink-soft);max-width:64ch}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:28px;margin-top:34px}
+  .hero-stat .n{font-family:var(--mono);font-size:26px;font-weight:600;letter-spacing:-.02em}
+  .hero-stat .l{font-size:12px;color:var(--ink-faint);text-transform:uppercase;
+                letter-spacing:.06em;margin-top:2px}
+
+  section{padding:52px 0;border-bottom:1px solid var(--rule)}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+  .sec-num{font-family:var(--mono);font-size:12px;color:var(--ink-faint)}
+  .sec-head h2{font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:-.01em}
+  .sec-desc{color:var(--ink-soft);font-size:15px;max-width:70ch;margin-bottom:26px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin-bottom:22px}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;font-size:12.5px;color:var(--ink-soft)}
+  .legend .k{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+
+  .board-scroll{overflow-x:auto}
+  .board{width:100%;border-collapse:collapse;font-size:14.5px;min-width:900px}
+  .board thead th{text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.07em;
+                  text-transform:uppercase;color:var(--ink-faint);font-weight:500;
+                  padding:0 16px 12px;border-bottom:1px solid var(--rule-strong);white-space:nowrap}
+  .board thead th.num,.board tbody td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .board tbody tr{border-bottom:1px solid var(--rule);transition:background .12s}
+  .board tbody tr:hover{background:var(--paper-2)}
+  .board tbody td{padding:15px 16px;vertical-align:middle}
+  .board tbody tr.legacy .agent-name,.board tbody tr.reference .agent-name{font-weight:500}
+  .rank{font-family:var(--mono);font-size:15px;color:var(--ink-faint);width:34px}
+  .rank.top{color:var(--accent);font-weight:600}
+  .agent-cell{display:flex;align-items:center;gap:12px}
+  .band-tick{width:3px;height:32px;border-radius:2px;flex:none;background:var(--measured)}
+  .band-tick.reference{background:var(--reference)}
+  .band-tick.legacy{background:var(--legacy)}
+  .agent-name{font-weight:600;font-size:15px}
+  .agent-arch{font-size:12px;color:var(--ink-faint);font-family:var(--mono);margin-top:1px}
+  .score-cell{display:flex;align-items:center;gap:12px;justify-content:flex-end}
+  .score-num{font-family:var(--mono);font-weight:600;font-size:16px;min-width:86px;text-align:right}
+  .score-num.lead{color:var(--accent)}
+  .pm{color:var(--ink-faint);font-weight:400;font-size:13px}
+  .bar{width:110px;height:7px;background:var(--bar-track);border-radius:4px;overflow:hidden;flex:none}
+  .bar>span{display:block;height:100%;background:var(--ink-soft);border-radius:4px}
+  .bar>span.lead{background:var(--accent)}
+  .sub-num{font-family:var(--mono);font-size:13.5px;color:var(--ink-soft);white-space:nowrap}
+  .band-pill{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+             padding:3px 7px;border-radius:2px;white-space:nowrap;color:var(--measured);
+             background:color-mix(in srgb,var(--measured) 12%,transparent)}
+  .band-pill.reference{color:var(--reference);
+             background:color-mix(in srgb,var(--reference) 12%,transparent)}
+  .band-pill.legacy{color:var(--legacy);
+             background:color-mix(in srgb,var(--legacy) 14%,transparent)}
+  .na{color:var(--ink-faint);cursor:help}
+  .warn{color:var(--warn);cursor:help}
+
+  .note{font-size:12.5px;color:var(--ink-faint);margin-top:16px;line-height:1.65;max-width:82ch}
+  .note strong,.note b{color:var(--ink-soft);font-weight:600}
+  .note+.note{margin-top:9px}
+
+  .grid-scroll{overflow-x:auto}
+  .breakdown{width:100%;border-collapse:collapse;font-size:13.5px;min-width:660px}
+  .breakdown th,.breakdown td{padding:11px 14px;text-align:right;font-variant-numeric:tabular-nums}
+  .breakdown th:first-child,.breakdown td:first-child{text-align:left}
+  .breakdown thead th{font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+       text-transform:uppercase;color:var(--ink-faint);font-weight:500;
+       border-bottom:1px solid var(--rule-strong)}
+  .breakdown tbody tr{border-bottom:1px solid var(--rule)}
+  .breakdown tbody td:first-child{font-family:var(--sans);font-size:14px;color:var(--ink);
+       font-weight:600}
+  .heat{font-family:var(--mono);padding:4px 9px;border-radius:3px;display:inline-block;min-width:44px}
+
+  .scatter-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .scatter-box{border:1px solid var(--rule);border-radius:4px;background:var(--paper-2);
+               padding:18px 18px 10px}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  .axis-line{stroke:var(--rule-strong);stroke-width:1}
+  .grid-line{stroke:var(--rule);stroke-width:1;stroke-dasharray:2 4}
+  .axis-label{font-family:var(--mono);font-size:10px;fill:var(--ink-faint)}
+  .axis-title{font-family:var(--mono);font-size:11px;letter-spacing:.05em;fill:var(--ink-soft);
+              text-transform:uppercase}
+  .pt{fill:var(--measured)}
+  .pt.reference{fill:var(--reference)}
+  .pt.legacy{fill:var(--legacy)}
+  .pt-label{font-family:var(--mono);font-size:11px;fill:var(--ink);font-weight:600}
+  .pt-sub{font-family:var(--mono);font-size:9.5px;fill:var(--ink-faint)}
+
+  footer{padding:44px 0 68px}
+  footer .cols{display:flex;flex-wrap:wrap;gap:44px;justify-content:space-between}
+  footer p{font-size:13px;color:var(--ink-faint);max-width:54ch}
+  footer .method{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);line-height:1.95}
+  footer code{font-family:var(--mono);font-size:11.5px}
+
+  @media (max-width:860px){.scatter-grid{grid-template-columns:1fr}}
+  @media (max-width:720px){.wrap{padding:0 20px}.nav{display:none}.hero-meta{gap:20px}}
+"""
+
+JS = """
+function toggleTheme(){
+  var r=document.documentElement, d=r.getAttribute('data-theme')==='dark';
+  r.setAttribute('data-theme', d?'light':'dark');
+  document.getElementById('themeBtn').textContent = d?'Dark':'Light';
+  try{localStorage.setItem('cb-theme', d?'light':'dark')}catch(e){}
+}
+(function(){
+  var t=null; try{t=localStorage.getItem('cb-theme')}catch(e){}
+  if(!t && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) t='dark';
+  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');
+    document.addEventListener('DOMContentLoaded',function(){
+      document.getElementById('themeBtn').textContent='Light';});}
+})();
 """
 
 
 def build(entries: list) -> str:
-    snaps = sorted({e["protocol"]["data_snapshot_id"] for e in entries})
-    sections = []
-    for snap in snaps:
-        group = [e for e in entries if e["protocol"]["data_snapshot_id"] == snap]
-        dens = sorted({e["protocol"]["denominator"] for e in group})
-        systems = [e for e in group if e["system"].get("kind") != "reference"]
-        refs = [e for e in group if e["system"].get("kind") == "reference"]
-        systems.sort(key=lambda e: -(e["results"]["execution_accuracy"]["mean"] or 0))
-        rows = [row_html(e, "&mdash;") for e in refs]
-        rows += [row_html(e, str(i)) for i, e in enumerate(systems, 1)]
-        den_note = (f"all rows scored over {dens[0]} gradable tasks"
-                    if len(dens) == 1 else
-                    f'<span class="warn">mixed denominators {dens} &mdash; rows are not comparable</span>')
-        sections.append(f"""  <h2>Snapshot <code>{html.escape(snap)}</code></h2>
-  <p class="legend">Gold answers are bound to the data snapshot; entries scored against different
-  snapshots are listed under separate headings and must not be compared. Here, {den_note}.</p>
-  <div class="wrap"><table>
-    <thead><tr>
-      <th>#</th><th>System</th><th>Organization</th><th>Model</th>
-      <th title="Execution accuracy: mean over all runs, with standard deviation.">EX (mean &plusmn; sd)</th>
-      <th title="Tasks passed at least once / tasks passed on every run.">pass@N / pass^N</th>
-      <th title="Tasks attempted out of the board denominator.">Coverage</th>
-      <th title="Fraction of sessions where every turn passed.">Session</th>
-      <th title="Accuracy on the 41 multi-turn tier-9 turns.">Multi&#8209;turn</th>
-      <th>USD/task</th><th>Median s</th><th>Verification</th><th>Evaluated</th>
-    </tr></thead>
-    <tbody>
-{chr(10).join(rows)}
-    </tbody>
-  </table></div>
-
-  <h2>By tier</h2>
-{tier_table(refs + systems)}""")
-
+    snap = current_snapshot(entries)
+    ranked = [e for e in entries if band_of(e, snap) == "measured"]
+    legacy = [e for e in entries if band_of(e, snap) == "legacy"]
+    floor = next((e for e in entries if band_of(e, snap) == "reference"), None)
+    den = max(e["protocol"]["denominator"] for e in entries)
+    runs = max((e["protocol"]["runs"] for e in ranked), default=1)
     built = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    plural = "y" if len(entries) == 1 else "ies"
-    return f"""<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cortex-Bench leaderboard</title>
+
+    legacy_note = ""
+    if legacy:
+        names = ", ".join(html.escape(e["system"]["name"]) for e in legacy)
+        legacy_note = (
+            f'      <p class="note"><strong>{names}</strong> carries a <b>Legacy</b> pill because it '
+            f'was measured against an earlier data snapshot. Gold answers are bound to the snapshot '
+            f'they were compiled from, so that figure is real but not comparable with the ranked '
+            f'rows, and it takes no rank. Its captured SQL cannot be re-executed either &mdash; the '
+            f'agent emitted parameterised SQL whose bound values were never recorded &mdash; so a '
+            f'comparable number needs the agent re-run, not the capture re-scored.</p>')
+
+    floor_note = ""
+    if floor:
+        floor_note = (
+            f'      <p class="note"><strong>{html.escape(floor["system"]["name"])}</strong> is a '
+            f'control, not a competitor: it returns the empty set for every task, reads no data and '
+            f'calls no model. It scores {100*ex(floor):.1f}% because some questions in this benchmark '
+            f'genuinely have no rows to return. Read every other score against it.</p>')
+
+    return f"""<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cortex-Bench &mdash; Wealth-Management Text-to-SQL Leaderboard</title>
 <style>{CSS}</style>
-</head><body><main>
-  <h1>Cortex-Bench leaderboard</h1>
-  <p class="tagline">Text-to-SQL over a 22-table, 63-million-row synthetic Indian wealth-management
-  warehouse. 200 questions across 9 tiers, 190 execution-scored.</p>
+<script>{JS}</script>
+</head>
+<body>
 
-  <div class="note"><strong>Every score here is a mean over repeated runs, and the spread is
-  printed next to it.</strong> We measured two identical runs of the same agent &mdash; same model,
-  same questions, temperature&nbsp;0 &mdash; disagreeing on 21% of tasks. A single-run leaderboard
-  number implies a precision that does not exist, so three runs are mandatory and every run's score
-  is published in the entry file.</div>
+<div class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand"><span class="mark">Cortex&#8209;Bench</span><span class="sub">Neosapients</span></div>
+    <nav class="nav">
+      <a href="#leaderboard">Leaderboard</a>
+      <a href="#breakdown">By tier</a>
+      <a href="#efficiency">Cost &amp; latency</a>
+      <a href="#method">Method</a>
+      <a href="{REPO_URL}">Repository</a>
+    </nav>
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">Dark</button>
+  </div>
+</div>
 
-{chr(10).join(sections)}
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Enterprise text-to-SQL &middot; snapshot {html.escape(snap)}</div>
+    <h1>How accurately do data agents answer real wealth-management questions?</h1>
+    <p>Cortex-Bench scores agents on {den} questions against a 22-table, 58-million-row synthetic
+       Indian wealth-management warehouse. Nine tiers, from schema linking to multi-turn sessions,
+       including a tier whose correct answer is that the question cannot be answered from the data.
+       Every row below was executed by the organizers, and every score is a mean over repeated runs.</p>
+    <div class="hero-meta">
+      <div class="hero-stat"><div class="n">{den}</div><div class="l">Scored tasks</div></div>
+      <div class="hero-stat"><div class="n">{runs}&times;</div><div class="l">Runs per task</div></div>
+      <div class="hero-stat"><div class="n">22</div><div class="l">Tables &middot; 58.5M rows</div></div>
+      <div class="hero-stat"><div class="n">9</div><div class="l">Difficulty tiers</div></div>
+    </div>
+  </div>
+</header>
 
-  <h2>How to read this board</h2>
-  <ul>
-    <li><strong>The denominator never changes.</strong> A system that attempts 149 of 190 tasks is
-      scored out of 190; the skipped tasks count as failures and the coverage column says so.
-      Skipping work must not raise a score.</li>
-    <li><strong>pass@N / pass^N</strong> is the honest measure of stability: how many tasks the
-      system got right at least once, versus on every single run. The gap is churn.</li>
-    <li><strong>The null floor is a row, not a footnote.</strong> It answers nothing at all. Any
-      system that does not clearly beat it has told you nothing.</li>
-    <li><strong>A dash is not a zero.</strong> Hover it for why the metric was not measured.</li>
-  </ul>
+<section id="leaderboard">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Leaderboard</h2></div>
+    <p class="sec-desc">Ranked by <strong>execution accuracy</strong> &mdash; the mean over every run,
+       with the standard deviation beside it. The denominator is always {den}: a system that does not
+       attempt a task is scored as failing it, and the coverage column shows what it skipped.
+       Skipping work must never raise a score.</p>
 
-  <h2>Not on this board yet</h2>
-  <ul>
-    <li><strong>Human baseline.</strong> Not yet run. Until it exists the board has no ceiling, and
-      no reader can tell whether 53% is close to the limit or nowhere near it.</li>
-    <li><strong>Single-call schema-only baseline.</strong> Not yet run.</li>
-    <li><strong>Our own agent.</strong> Its captured runs predate the v1.2 data repair and its
-      emitted SQL is not re-executable, so it has no honest score on this snapshot. It will appear
-      when it has been re-run, through the same path as every other entry.</li>
-  </ul>
+    <div class="controls">
+      <div class="legend">
+        <span class="k"><span class="dot" style="background:var(--measured)"></span>Measured &mdash; ranked, current snapshot</span>
+        <span class="k"><span class="dot" style="background:var(--reference)"></span>Reference &mdash; control, not a competitor</span>
+        <span class="k"><span class="dot" style="background:var(--legacy)"></span>Legacy &mdash; older snapshot, unranked</span>
+      </div>
+    </div>
 
-  <h2>Submitting</h2>
-  <p>Add one JSON file to <code>results/</code>, named for its <code>entry_id</code>, and open a
-  pull request. CI validates it against <code>schema/leaderboard_entry.schema.json</code> and
-  rebuilds this page on merge. Run
-  <code>python3 leaderboard/validate_entry.py results/your-entry.json</code> first.</p>
+    <div class="board-scroll">
+    <table class="board">
+      <thead>
+        <tr>
+          <th style="width:34px">#</th>
+          <th>System</th>
+          <th>Band</th>
+          <th class="num">Execution accuracy</th>
+          <th class="num" title="Tasks passed at least once / passed on every run.">pass@N / pass^N</th>
+          <th class="num">Coverage</th>
+          <th class="num">Latency</th>
+          <th class="num">Cost/task</th>
+          <th class="num">Snapshot</th>
+        </tr>
+      </thead>
+      <tbody>
+{board_rows(entries, snap)}
+      </tbody>
+    </table>
+    </div>
+{floor_note}
+      <p class="note"><strong>Why the spread is printed.</strong> Two identical runs of the same agent
+      &mdash; same model, same questions, temperature&nbsp;0 &mdash; disagreed on 21% of tasks.
+      A single-run number implies a precision that does not exist, so three runs are required and
+      every run's score is published in the entry file. <b>pass@N</b> counts tasks solved at least
+      once; <b>pass^N</b> counts tasks solved every time. The gap between them is churn.</p>
+{legacy_note}
+      <p class="note">A dash is not a zero. Hover it to see why the metric was not measured.</p>
+  </div>
+</section>
 
-  <footer>
-    Built {built} from {len(entries)} entr{plural} in
-    <code>results/</code>. This page is generated &mdash; edit the JSON, never the HTML.
-    Provenance for any row: <code>git log results/&lt;entry-id&gt;.json</code>.
-  </footer>
-</main></body></html>
+<section id="breakdown">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Accuracy by difficulty tier</h2></div>
+    <p class="sec-desc">Where each system actually loses. Tiers 1&ndash;2 are lookups and filters,
+       3&ndash;5 add joins, aggregation and window functions, 6 requires applying Indian market and
+       taxation rules, 7 asks questions the data cannot answer, and 9 is multi-turn. Darker cells are
+       stronger.</p>
+    <div class="grid-scroll">
+{tier_table(entries, snap)}
+    </div>
+    <p class="note">Tier 8 is excluded from every figure on this page: those ten tasks are graded
+       against a rubric and the judge is not implemented, so they are neither passes nor failures.</p>
+  </div>
+</section>
+
+<section id="efficiency">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Cost and latency against accuracy</h2></div>
+    <p class="sec-desc">What each system spends to get where it got. Accuracy runs along the
+       horizontal axis, so <strong>bottom-right is best</strong>: accurate and cheap, accurate and
+       fast. Correctness alone is not the whole picture on a 58-million-row database &mdash; a query
+       that returns the right answer in six minutes is not a usable one.</p>
+    <div class="scatter-grid">
+{scatter(entries, snap, "cost_usd_per_task", "USD per task", ".4f")}
+{scatter(entries, snap, "median_latency_s", "Median seconds", ".0f")}
+    </div>
+    <p class="note">Latency and cost come from the live agent runs. Neither is currently folded into
+       the score: an efficiency metric in the spirit of BIRD's VES is on the roadmap, and until it
+       exists a slow correct answer ranks exactly like a fast one.</p>
+  </div>
+</section>
+
+<footer id="method">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Method, in brief</h2></div>
+    <div class="cols">
+      <p class="method">
+        {den} execution-scored questions, 9 tiers, one frozen snapshot.<br>
+        Gold answers compiled by executing reference SQL against that snapshot.<br>
+        Synthetic data: deterministic, seed 42, FK-integrity validated, no PII.<br>
+        Scored by <code>eval/score_cortex_bench.py</code>, unmodified, by the organizers.<br>
+        Every run's score published, including the bad ones.
+      </p>
+      <p>
+        Each row on this board is a JSON file in <code>results/</code>, validated in CI against
+        <code>schema/leaderboard_entry.schema.json</code>. This page is regenerated from those files
+        and holds no data of its own &mdash; edit the JSON, never the HTML. The provenance of any
+        number is <code>git log results/&lt;entry-id&gt;.json</code>.
+        <br><br>
+        To submit, open a pull request adding one entry file.
+        Known defects are logged in <a href="{REPO_URL}/blob/main/ERRATA.md">ERRATA.md</a>, and what
+        the data does and does not model is in
+        <a href="{REPO_URL}/blob/main/DATASHEET.md">DATASHEET.md</a>.
+        <br><br>
+        <span class="tag">Built {built} from {len(entries)} entries.</span>
+      </p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
 """
 
 
@@ -297,9 +608,10 @@ def main() -> int:
         except FileNotFoundError:
             print("docs/index.html is missing; run leaderboard/build.py", file=sys.stderr)
             return 1
-        # the build stamp is the only line that legitimately changes on every run
+
         def strip(s):
             return "\n".join(l for l in s.splitlines() if "Built 20" not in l)
+
         if strip(cur) != strip(page):
             print("docs/index.html is stale; run leaderboard/build.py", file=sys.stderr)
             return 1

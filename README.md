@@ -27,10 +27,11 @@ that they do not is depth in one domain, conversations, and questions designed t
 Live board: **[jjayeshneo.github.io/Cortex-Benchmark](https://jjayeshneo.github.io/Cortex-Benchmark/)** —
 generated from `results/*.json`, one committed file per row.
 
-| | System | Model | EX (mean ± sd) | pass@3 / pass^3 | Coverage |
-|---|---|---|---|---|---|
-| — | *Null floor — answers nothing* | *none* | *4.7%* | — | 190/190 |
-| 1 | LangChain SQL agent | gpt-5.6-luna | **53.3% ± 1.6** | 117 / 86 | 149/190 |
+| | System | Model | EX (mean ± sd) | pass@N / pass^N | Coverage | Snapshot |
+|---|---|---|---|---|---|---|
+| — | *Null floor — answers nothing* | *none* | *4.7%* | — | 190/190 | v1.3 |
+| 1 | LangChain SQL agent | gpt-5.6-luna | **53.3% ± 1.6** | 117 / 86 | 149/190 | v1.3 |
+| — | *Neo-Cortex* | *not recorded* | *36.8%* | — | 149/190 | **v1.1** |
 
 **Every number on this board is a mean over three runs, and the denominator is always 190.** Two
 things follow that are easy to miss:
@@ -43,6 +44,9 @@ things follow that are easy to miss:
   not: **31 tasks (21%) change verdict between runs** at identical settings. `pass@3` (passed at
   least once) is 117; `pass^3` (passed every time) is 86. The 31-task gap is churn, and a
   leaderboard reporting one number per system is publishing it as signal.
+- **Snapshots never mix in a ranking.** Neo-Cortex was measured against the v1.1 snapshot, so its
+  figure is real but not comparable with the ranked rows and it takes no rank. Gold answers are
+  bound to the snapshot they were compiled against.
 
 **The floor row is there on purpose.** A system that answers nothing at all scores 4.7%, because
 some questions in this benchmark genuinely have no rows to return. Read every other score against
