@@ -449,6 +449,8 @@ def build(entries: list) -> str:
     legacy = [e for e in entries if band_of(e, snap) == "legacy"]
     floor = next((e for e in entries if band_of(e, snap) == "reference"), None)
     den = max(e["protocol"]["denominator"] for e in entries)
+    atts = {e["protocol"].get("attempted") for e in entries if e["protocol"].get("attempted")}
+    att = next(iter(atts)) if len(atts) == 1 else den
     runs = max((e["protocol"]["runs"] for e in ranked), default=1)
     built = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
@@ -527,9 +529,11 @@ def build(entries: list) -> str:
     <div class="sec-head"><span class="sec-num">01</span><h2>Leaderboard</h2></div>
     <p class="sec-desc">Ranked by <strong>Pass^N</strong> &mdash; a task counts only if the system
        solves it correctly on <em>every</em> run. <strong>Pass@N</strong> (solved at least once) sits
-       beside it, and execution accuracy, the mean across runs with its spread, is printed under each
-       Pass^N figure. The denominator is always {den}: a system that does not attempt a task is scored
-       as failing it, and each row states what it skipped. Skipping work must never raise a score.</p>
+       beside it. Both are measured over the tasks a system actually attempted, so they answer
+       &ldquo;when it answers, can you rely on it?&rdquo;. Underneath each sits <strong>EX</strong>,
+       execution accuracy over the full {den}-task set, where anything unattempted counts as a
+       failure &mdash; so skipping still costs you there. Every system on this board attempted the
+       same {att} single-turn tasks, which makes the reliability figures directly comparable.</p>
 
     <div class="controls">
       <div class="legend">{legend_keys}</div>
@@ -542,8 +546,8 @@ def build(entries: list) -> str:
           <th style="width:34px">#</th>
           <th>System</th>
           <th>Band</th>
-          <th class="num" title="Fraction of tasks solved on EVERY run. The ranking metric.">Pass^N</th>
-          <th class="num" title="Fraction of tasks solved at least once.">Pass@N</th>
+          <th class="num" title="Of the tasks the system attempted, the fraction solved on EVERY run. The ranking metric.">Pass^N</th>
+          <th class="num" title="Of the tasks the system attempted, the fraction solved at least once.">Pass@N</th>
           <th class="num">Latency</th>
           <th class="num">Tokens/task</th>
           <th class="num">Cost/task</th>
@@ -562,6 +566,10 @@ def build(entries: list) -> str:
       the ranking metric is the one a buyer actually cares about: solved every time. The gap between
       <b>Pass@N</b> and <b>Pass^N</b> is churn, and it is large for every system measured so far.
       Every individual run's score is published in the entry file, including the bad ones.</p>
+      <p class="note"><strong>Two denominators, on purpose.</strong> Pass^N and Pass@N are over the
+      {att} tasks attempted, because reliability is only meaningful about work a system took on. EX
+      is over all {den}, because a system must not be able to raise its headline by declining the
+      hard questions. Both are shown so neither can be quoted alone.</p>
 {legacy_note}
       <p class="note">A dash is not a zero. Hover it to see why the metric was not measured.</p>
   </div>
@@ -574,7 +582,8 @@ def build(entries: list) -> str:
        3&ndash;5 add joins, aggregation and window functions, 6 requires applying Indian market and
        taxation rules, 7 asks questions the data cannot answer, and 9 is multi-turn. Cells are
        Pass^N, the same metric the board ranks on, so a tier row and a board row mean the same
-       thing. Darker is stronger.</p>
+       thing. Tiers a system never attempted are left out rather than shown as zero. Darker is
+       stronger.</p>
     <div class="grid-scroll">
 {tier_table(entries, snap)}
     </div>

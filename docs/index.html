@@ -196,9 +196,11 @@ function toggleTheme(){
     <div class="sec-head"><span class="sec-num">01</span><h2>Leaderboard</h2></div>
     <p class="sec-desc">Ranked by <strong>Pass^N</strong> &mdash; a task counts only if the system
        solves it correctly on <em>every</em> run. <strong>Pass@N</strong> (solved at least once) sits
-       beside it, and execution accuracy, the mean across runs with its spread, is printed under each
-       Pass^N figure. The denominator is always 190: a system that does not attempt a task is scored
-       as failing it, and each row states what it skipped. Skipping work must never raise a score.</p>
+       beside it. Both are measured over the tasks a system actually attempted, so they answer
+       &ldquo;when it answers, can you rely on it?&rdquo;. Underneath each sits <strong>EX</strong>,
+       execution accuracy over the full 190-task set, where anything unattempted counts as a
+       failure &mdash; so skipping still costs you there. Every system on this board attempted the
+       same 149 single-turn tasks, which makes the reliability figures directly comparable.</p>
 
     <div class="controls">
       <div class="legend"><span class="k"><span class="dot" style="background:var(--measured)"></span>Measured &mdash; ranked, current snapshot</span><span class="k"><span class="dot" style="background:var(--legacy)"></span>Legacy &mdash; older snapshot, unranked</span></div>
@@ -211,8 +213,8 @@ function toggleTheme(){
           <th style="width:34px">#</th>
           <th>System</th>
           <th>Band</th>
-          <th class="num" title="Fraction of tasks solved on EVERY run. The ranking metric.">Pass^N</th>
-          <th class="num" title="Fraction of tasks solved at least once.">Pass@N</th>
+          <th class="num" title="Of the tasks the system attempted, the fraction solved on EVERY run. The ranking metric.">Pass^N</th>
+          <th class="num" title="Of the tasks the system attempted, the fraction solved at least once.">Pass@N</th>
           <th class="num">Latency</th>
           <th class="num">Tokens/task</th>
           <th class="num">Cost/task</th>
@@ -236,15 +238,15 @@ function toggleTheme(){
           <td class="num" title="runs: 53.7%, 51.6%, 54.7%">
             <div class="score-cell">
               <span class="bar"><span class="lead" style="width:100.0%"></span></span>
-              <span class="score-num lead">45.3%</span>
+              <span class="score-num lead">57.7%</span>
             </div>
             <div class="score-sub">EX 53.3%<span class="pm"> &plusmn;1.6</span></div>
           </td>
-          <td class="num sub-num">61.6%</td>
+          <td class="num sub-num">78.5%</td>
           <td class="num sub-num">20.7s</td>
           <td class="num sub-num"><span class="na" title="not measured">&mdash;</span></td>
           <td class="num sub-num">$0.0049</td>
-          <td class="num sub-num">$0.0107</td>
+          <td class="num sub-num">$0.0084</td>
         </tr>
         <tr class="legacy">
           <td class="rank">&mdash;</td>
@@ -253,7 +255,7 @@ function toggleTheme(){
               <span class="band-tick legacy"></span>
               <div>
                 <div class="agent-name">Neo-Cortex</div>
-                <div class="agent-arch">context-layer agent</div>
+                <div class="agent-arch">gpt-5.6-luna &middot; context-layer agent</div>
                 <div class="agent-arch"><span class="warn" title="Did not attempt 41 of 190 tasks; they are scored as failures.">149/190 attempted</span> &middot; 2 runs</div>
               </div>
             </div>
@@ -262,11 +264,11 @@ function toggleTheme(){
           <td class="num" title="runs: 48.4%, 52.1%">
             <div class="score-cell">
               <span class="bar"><span class="" style="width:98.8%"></span></span>
-              <span class="score-num">44.7%</span>
+              <span class="score-num">57.0%</span>
             </div>
             <div class="score-sub">EX 50.3%<span class="pm"> &plusmn;2.6</span></div>
           </td>
-          <td class="num sub-num">55.8%</td>
+          <td class="num sub-num">71.1%</td>
           <td class="num sub-num"><span class="na" title="These two captures record no per-task timing.">&mdash;</span></td>
           <td class="num sub-num"><span class="na" title="not measured">&mdash;</span></td>
           <td class="num sub-num"><span class="na" title="Per-task cost was not recorded during these runs.">&mdash;</span></td>
@@ -282,6 +284,10 @@ function toggleTheme(){
       the ranking metric is the one a buyer actually cares about: solved every time. The gap between
       <b>Pass@N</b> and <b>Pass^N</b> is churn, and it is large for every system measured so far.
       Every individual run's score is published in the entry file, including the bad ones.</p>
+      <p class="note"><strong>Two denominators, on purpose.</strong> Pass^N and Pass@N are over the
+      149 tasks attempted, because reliability is only meaningful about work a system took on. EX
+      is over all 190, because a system must not be able to raise its headline by declining the
+      hard questions. Both are shown so neither can be quoted alone.</p>
       <p class="note"><strong>Neo-Cortex</strong> carries a <b>Legacy</b> pill because it was measured against an earlier data snapshot. Gold answers are bound to the snapshot they were compiled from, so that figure is real but not comparable with the ranked rows, and it takes no rank. Its captured SQL cannot be re-executed either &mdash; the agent emitted parameterised SQL whose bound values were never recorded &mdash; so a comparable number needs the agent re-run, not the capture re-scored.</p>
       <p class="note">A dash is not a zero. Hover it to see why the metric was not measured.</p>
   </div>
@@ -294,16 +300,17 @@ function toggleTheme(){
        3&ndash;5 add joins, aggregation and window functions, 6 requires applying Indian market and
        taxation rules, 7 asks questions the data cannot answer, and 9 is multi-turn. Cells are
        Pass^N, the same metric the board ranks on, so a tier row and a board row mean the same
-       thing. Darker is stronger.</p>
+       thing. Tiers a system never attempted are left out rather than shown as zero. Darker is
+       stronger.</p>
     <div class="grid-scroll">
       <table class="breakdown">
-        <thead><tr><th>System</th><th class="num" title="Schema linking">T1</th><th class="num" title="Single-table filter">T2</th><th class="num" title="Joins">T3</th><th class="num" title="Aggregation">T4</th><th class="num" title="Window / ranking">T5</th><th class="num" title="Domain computation">T6</th><th class="num" title="Unanswerable / null-result">T7</th><th class="num" title="Multi-turn session">T9</th></tr></thead>
+        <thead><tr><th>System</th><th class="num" title="Schema linking">T1</th><th class="num" title="Single-table filter">T2</th><th class="num" title="Joins">T3</th><th class="num" title="Aggregation">T4</th><th class="num" title="Window / ranking">T5</th><th class="num" title="Domain computation">T6</th><th class="num" title="Unanswerable / null-result">T7</th></tr></thead>
         <tbody>
-        <tr><td>LangChain SQL agent</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">74</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 24%, transparent)">53</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 13%, transparent)">20</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">10</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0</span></td></tr>
-        <tr><td>Neo-Cortex</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">86</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">67</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">69</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 28%, transparent)">66</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 17%, transparent)">33</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 37%, transparent)">90</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0</span></td></tr>
+        <tr><td>LangChain SQL agent</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">74</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 24%, transparent)">53</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 13%, transparent)">20</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">10</span></td></tr>
+        <tr><td>Neo-Cortex</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">86</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">67</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">69</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 28%, transparent)">66</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 17%, transparent)">33</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 37%, transparent)">90</span></td></tr>
         </tbody>
       </table>
-      <p class="note"><b>T1</b> Schema linking &middot; <b>T2</b> Single-table filter &middot; <b>T3</b> Joins &middot; <b>T4</b> Aggregation &middot; <b>T5</b> Window / ranking &middot; <b>T6</b> Domain computation &middot; <b>T7</b> Unanswerable / null-result &middot; <b>T9</b> Multi-turn session. Values are Pass^N: % of the tier solved on every run.</p>
+      <p class="note"><b>T1</b> Schema linking &middot; <b>T2</b> Single-table filter &middot; <b>T3</b> Joins &middot; <b>T4</b> Aggregation &middot; <b>T5</b> Window / ranking &middot; <b>T6</b> Domain computation &middot; <b>T7</b> Unanswerable / null-result. Values are Pass^N: % of the tier solved on every run.</p>
     </div>
     <p class="note">Tier 8 is excluded from every figure on this page: those ten tasks are graded
        against a rubric and the judge is not implemented, so they are neither passes nor failures.</p>
@@ -318,8 +325,8 @@ function toggleTheme(){
        reliable and fast. Correctness alone is not the whole picture on a 58-million-row database &mdash; a query
        that returns the right answer in six minutes is not a usable one.</p>
     <div class="scatter-grid">
-<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="USD per task against Pass^N"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0.0000</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">0.0015</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">0.0030</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">0.0046</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">0.0061</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">14%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">27%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">41%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">54%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Pass^N</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">USD per task</text><circle class="pt measured" cx="623.7" cy="85.6" r="6.5"/><text class="pt-label" x="612.7" y="83.6" text-anchor="end">LangChain SQL agent</text><text class="pt-sub" x="612.7" y="96.6" text-anchor="end">45.3% &middot; 0.0049</text></svg></div>
-<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="Median seconds against Pass^N"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">6</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">13</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">19</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">26</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">14%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">27%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">41%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">54%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Pass^N</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">Median seconds</text><circle class="pt measured" cx="623.7" cy="85.6" r="6.5"/><text class="pt-label" x="612.7" y="83.6" text-anchor="end">LangChain SQL agent</text><text class="pt-sub" x="612.7" y="96.6" text-anchor="end">45.3% &middot; 21</text></svg></div>
+<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="USD per task against Pass^N"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0.0000</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">0.0015</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">0.0030</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">0.0046</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">0.0061</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">17%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">35%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">52%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">69%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Pass^N</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">USD per task</text><circle class="pt measured" cx="623.7" cy="85.6" r="6.5"/><text class="pt-label" x="612.7" y="83.6" text-anchor="end">LangChain SQL agent</text><text class="pt-sub" x="612.7" y="96.6" text-anchor="end">57.7% &middot; 0.0049</text></svg></div>
+<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="Median seconds against Pass^N"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">6</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">13</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">19</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">26</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">17%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">35%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">52%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">69%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Pass^N</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">Median seconds</text><circle class="pt measured" cx="623.7" cy="85.6" r="6.5"/><text class="pt-label" x="612.7" y="83.6" text-anchor="end">LangChain SQL agent</text><text class="pt-sub" x="612.7" y="96.6" text-anchor="end">57.7% &middot; 21</text></svg></div>
     </div>
     <p class="note">Latency and cost come from the live agent runs. Neither is currently folded into
        the score: an efficiency metric in the spirit of BIRD's VES is on the roadmap, and until it
@@ -349,7 +356,7 @@ function toggleTheme(){
         the data does and does not model is in
         <a href="https://github.com/jjayeshneo/Cortex-Benchmark/blob/main/DATASHEET.md">DATASHEET.md</a>.
         <br><br>
-        <span class="tag">Built 2026-09-01 14:05 UTC from 2 entries.</span>
+        <span class="tag">Built 2026-09-01 14:08 UTC from 2 entries.</span>
       </p>
     </div>
   </div>

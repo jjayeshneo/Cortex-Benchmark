@@ -29,18 +29,20 @@ generated from `results/*.json`, one committed file per row.
 
 | | System | Model | Pass^N | Pass@N | EX (mean ± sd) | Runs | Snapshot |
 |---|---|---|---|---|---|---|---|
-| 1 | LangChain SQL agent | gpt-5.6-luna | **45.3%** | 61.6% | 53.3% ± 1.6 | 3 | v1.3 |
-| — | *Neo-Cortex* | *not recorded* | *44.7%* | *55.8%* | *50.3% ± 2.6* | 2 | **v1.1** |
+| 1 | LangChain SQL agent | gpt-5.6-luna | **57.7%** | 78.5% | 53.3% ± 1.6 | 3 | v1.3 |
+| — | *Neo-Cortex* | *gpt-5.6-luna* | *57.0%* | *71.1%* | *50.3% ± 2.6* | 2 | **v1.1** |
 
 **The board ranks on Pass^N — a task counts only if the system solves it on every run.** Three
 things follow that are easy to miss:
 
-- **Ranking on the average would reward unreliability.** LangChain averages 53.3% but only 45.3%
-  of tasks survive all three runs; **31 tasks (21%) change verdict between identical runs** at
-  temperature 0. Pass@3 is 117 tasks, Pass^3 is 86. That 31-task gap is churn, and a leaderboard
-  that reports one number per system is publishing it as signal.
-- **Skipping does not help you.** The denominator is always 190. Both systems are single-turn, so
-  neither attempts the 41 multi-turn turns and those score as failures.
+- **Two denominators, on purpose.** Pass^N and Pass@N are over the **149** tasks each system
+  attempted, because reliability is only meaningful about work a system took on. EX is over all
+  **190**, where an unattempted task counts as a failure — so declining the hard questions still
+  costs you. Both systems attempted the same 149 single-turn tasks.
+- **Ranking on the average would reward unreliability.** LangChain solves 117 of 149 tasks at least
+  once but only 86 of them every time: **31 tasks (21%) change verdict between identical runs** at
+  temperature 0. That gap is churn, and a leaderboard reporting one number per system is publishing
+  it as signal.
 - **Snapshots never mix in a ranking.** Neo-Cortex was measured against the v1.1 snapshot, so its
   figures are real but not comparable with the ranked row, and it takes no rank. Gold answers are
   bound to the snapshot they were compiled against, and its captured SQL cannot be replayed onto a
