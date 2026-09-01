@@ -163,7 +163,6 @@ Stated by us, before anyone else states them.
 - **No human baseline.** We do not know the ceiling.
 - **No held-out test server yet.** The submission process is not live.
 - **Tier 8 (10 questions) is unscored** — the rubric judge is not implemented.
-- **Tier 7 is 9/10 zero-row**, so "answer nothing" scores 90% on that tier. Being rebalanced.
 - **Fixed income is incompletely modelled.** Bonds have no daily mark-to-market series, so FI
   valuation and clean/dirty price questions are out of scope.
 - **Dividends are declared but never settle.** Corporate actions are reference data that never
