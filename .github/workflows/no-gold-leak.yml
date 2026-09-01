@@ -1,0 +1,58 @@
+# The only irreversible failure mode in this project.
+#
+# A leaked gold answer cannot be un-leaked. Once the private questions or their answers are
+# public the benchmark stops measuring anything, and no later cleanup restores it. This job
+# therefore runs on every push and every pull request, including forks, and is a required
+# status check on main.
+#
+# It works from a POSITIVE allowlist: any Cortex-Bench task id that is not one of the published
+# sample ids is a leak, and any gold-bearing field outside sample/sample_questions.json is a
+# leak. It is never given the list of private ids -- shipping that list would itself be a
+# disclosure, and it would fail open for tasks added later.
+name: no-gold-leak
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # scan history too, not just the tip
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prove the check can fail
+        # A guard that has never failed is not known to work. The selftest plants deliberate
+        # leaks and requires each to be detected, so a check silently broken by a refactor
+        # fails the build instead of passing everything.
+        run: python3 tools/check_no_gold_leak.py . --selftest
+
+      - name: Scan the working tree
+        run: python3 tools/check_no_gold_leak.py .
+
+      - name: Scan every file ever committed
+        # A gold file deleted in a later commit is still served by the raw history endpoint.
+        # Deleting it is not sufficient; it must never be committed.
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          fail=0
+          while read -r blob path; do
+            case "$path" in
+              *questions_answers*|*answer_key*|*gold_answers/*|*input_tasks/*)
+                echo "::error file=$path::answer-key artifact present in git history ($blob)"
+                fail=1 ;;
+            esac
+          done < <(git rev-list --objects --all | awk 'NF==2 {print $1, $2}')
+          rm -rf "$tmp"
+          exit $fail

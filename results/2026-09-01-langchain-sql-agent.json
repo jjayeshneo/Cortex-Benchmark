@@ -1,0 +1,114 @@
+{
+  "entry_id": "2026-09-01-langchain-sql-agent",
+  "system": {
+    "name": "LangChain SQL agent",
+    "version": "langchain create_sql_agent, default toolkit",
+    "organization": "Cortex-Bench organizers (reference implementation)",
+    "url": null,
+    "paper": null,
+    "code": null,
+    "open_source": true,
+    "kind": "framework"
+  },
+  "model": {
+    "name": "gpt-5.6-luna",
+    "provider": "OpenAI",
+    "access": "api",
+    "training_cutoff": null,
+    "temperature": 0,
+    "controlled": false
+  },
+  "protocol": {
+    "split": "full",
+    "corpus_version": "v1.3",
+    "data_snapshot_id": "wm_synthetic_v1.3_2026_09_01",
+    "scorer_version": "cortex_scorer_v1.6",
+    "runs": 3,
+    "denominator": 190,
+    "attempted": 149,
+    "evidence_provided": true,
+    "verified_by_organizers": true,
+    "evaluated_at": "2026-09-01T17:53:22Z"
+  },
+  "results": {
+    "execution_accuracy": {
+      "mean": 0.533333,
+      "std": 0.016079,
+      "runs": [
+        0.536842,
+        0.515789,
+        0.547368
+      ],
+      "n": 101
+    },
+    "session_accuracy": {
+      "mean": 0.645435,
+      "std": 0.019459,
+      "runs": [
+        0.649682,
+        0.624204,
+        0.66242
+      ]
+    },
+    "multi_turn_session_accuracy": {
+      "mean": 0.0,
+      "runs": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unavailable_reason": null
+    },
+    "multi_turn_turn_accuracy": {
+      "mean": 0.0,
+      "runs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "pass_any": {
+      "mean": 0.615789,
+      "n": 117
+    },
+    "pass_all": {
+      "mean": 0.452632,
+      "n": 86
+    },
+    "cost_usd_per_task": {
+      "mean": 0.004862,
+      "std": 0.000208,
+      "runs": [
+        0.004627,
+        0.004934,
+        0.005024
+      ]
+    },
+    "median_latency_s": {
+      "mean": 20.4,
+      "std": 1.32,
+      "runs": [
+        21.07,
+        21.24,
+        18.88
+      ]
+    },
+    "by_tier": {
+      "1": 0.7857,
+      "2": 0.8667,
+      "3": 0.8381,
+      "4": 0.7905,
+      "5": 0.7556,
+      "6": 0.2667,
+      "7": 0.2333,
+      "9": 0.0
+    }
+  },
+  "declarations": {
+    "canary_check": "not-applicable",
+    "test_data_seen": false,
+    "human_in_loop": false,
+    "artifacts": "runs/v13_replay/ (organizer-side; per-task SQL, verdict, latency and cost for all three runs)",
+    "notes": "Single-turn only: the 41 tier-9 multi-turn turns were not attempted and are scored as failures, which is why execution accuracy over the 190-task denominator is far below the single-turn subset figure of 68.0%. SQL was captured during the live runs and re-executed verbatim against the scored snapshot; latency and cost are from the live runs, verdicts from the re-execution. Re-scoring these same captures from v1.2 to v1.3 changed 0 of 600 task-run verdicts."
+  }
+}

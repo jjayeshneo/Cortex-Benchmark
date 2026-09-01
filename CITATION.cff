@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: "Cortex-Bench: enterprise-scale text-to-SQL with domain knowledge, multi-turn sessions and unanswerable questions"
+message: "If you use this benchmark, please cite it and state which data snapshot you evaluated against."
+type: dataset
+authors:
+  - name: "Neosapients"
+abstract: >-
+  Cortex-Bench evaluates text-to-SQL and analytical agents against a single 58-million-row
+  synthetic Indian wealth-management database. Its 200 questions span nine tiers, from schema
+  linking to multi-turn sessions, and include a tier whose correct answer is that the question
+  cannot be answered from the data. Gold answers are compiled by executing reference SQL against
+  a frozen snapshot and are valid only against that snapshot.
+keywords:
+  - text-to-SQL
+  - semantic parsing
+  - database question answering
+  - multi-turn
+  - unanswerable questions
+  - domain knowledge
+license: CC-BY-SA-4.0
+version: "1.3"
+date-released: "2026-09-01"

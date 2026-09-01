@@ -1,0 +1,38 @@
+# The leaderboard's integrity check.
+#
+# Two failure modes this guards against, both of which have embarrassed other benchmarks:
+#   1. A row whose headline number is not the mean of its published runs -- i.e. a hand-edited or
+#      cherry-picked score. validate_entry.py recomputes it.
+#   2. A published page that has drifted from the JSON it claims to display. build.py --check
+#      rebuilds and diffs, so docs/index.html can never quietly disagree with results/.
+name: leaderboard
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prove the validator can fail
+        # Same discipline as the leak check: a guard that has never rejected anything is not
+        # known to work. The selftest plants eight malformed entries and requires each to be
+        # rejected, so a refactor that breaks validation fails the build instead of passing it.
+        run: python3 leaderboard/validate_entry.py --selftest
+
+      - name: Validate every entry
+        run: python3 leaderboard/validate_entry.py
+
+      - name: The published page must match the entries
+        run: python3 leaderboard/build.py --check

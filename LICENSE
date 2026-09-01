@@ -1,0 +1,31 @@
+Cortex-Bench dataset — Creative Commons Attribution-ShareAlike 4.0 International
+(CC BY-SA 4.0)
+
+This licence covers the DATA and the QUESTIONS: the DuckDB database, the schema, the sample
+questions and their gold answers, and the documentation in this repository.
+
+The SOFTWARE in this repository (the scorer, the tooling under eval/ and tools/, the CI
+workflows) is licensed separately under Apache-2.0. See LICENSE-CODE.
+
+You are free to:
+  Share  — copy and redistribute the material in any medium or format
+  Adapt  — remix, transform, and build upon the material for any purpose, including commercially
+
+Under the following terms:
+  Attribution — You must give appropriate credit, provide a link to the licence, and indicate if
+                changes were made.
+  ShareAlike  — If you remix, transform, or build upon the material, you must distribute your
+                contributions under the same licence as the original.
+  No additional restrictions — You may not apply legal terms or technological measures that
+                legally restrict others from doing anything the licence permits.
+
+Full licence text: https://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+-------------------------------------------------------------------------------
+BEFORE PUBLISHING: replace this notice with the complete CC BY-SA 4.0 legal text
+from the URL above. A summary is not a licence.
+-------------------------------------------------------------------------------
+
+NO WARRANTY. The dataset is synthetic and provided as-is. It encodes Indian securities taxation
+rules as a fixture for evaluating query correctness; it is not tax, legal or financial advice and
+must not be relied on as such.

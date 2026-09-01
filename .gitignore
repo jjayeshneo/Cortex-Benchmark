@@ -1,0 +1,4 @@
+.sample_eval/
+__pycache__/
+*.pyc
+data/*.duckdb

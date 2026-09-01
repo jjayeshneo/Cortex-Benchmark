@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cortex-Bench leaderboard</title>
+<style>
+:root{--bg:#fff;--fg:#16181d;--muted:#6b7280;--line:#e5e7eb;--accent:#1d4ed8;
+      --warn:#b45309;--refbg:#f8fafc;--hot:#b91c1c}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1115;--fg:#e8eaed;--muted:#9aa3af;
+      --line:#262b33;--accent:#7aa2ff;--warn:#e0a33e;--refbg:#161a21;--hot:#f87171}}
+*{box-sizing:border-box}
+body{margin:0;padding:2.2rem 1.2rem 4rem;background:var(--bg);color:var(--fg);
+     font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:1180px;margin:0 auto}
+h1{font-size:1.9rem;margin:0 0 .2rem;letter-spacing:-.02em}
+h2{font-size:1.15rem;margin:2.6rem 0 .6rem;letter-spacing:-.01em}
+.tagline{color:var(--muted);margin:0 0 1.6rem}
+.wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:960px}
+th,td{padding:.6rem .7rem;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+tbody tr:last-child td{border-bottom:none}
+td.rank{color:var(--muted);font-variant-numeric:tabular-nums}
+td.ex{font-weight:650;font-variant-numeric:tabular-nums}
+.sub{color:var(--muted);font-size:11.5px;font-weight:400;white-space:normal}
+.pm{color:var(--muted);font-weight:400}
+.na{color:var(--muted);cursor:help}
+.warn{color:var(--warn);cursor:help;font-weight:600}
+.refrow{background:var(--refbg)}
+.refrow td.sys strong{font-weight:600}
+.v-yes{color:#15803d}.v-no{color:var(--muted)}
+@media (prefers-color-scheme:dark){.v-yes{color:#4ade80}}
+.tiers{min-width:640px;border:1px solid var(--line);border-radius:10px}
+.tiers td{font-variant-numeric:tabular-nums}
+.tiers td.hot{color:var(--hot);font-weight:600}
+.legend{color:var(--muted);font-size:12px}
+.note{border-left:3px solid var(--accent);padding:.15rem 0 .15rem 1rem;margin:1rem 0;
+      color:var(--fg)}
+.note strong{font-weight:650}
+ul{padding-left:1.15rem}li{margin:.35rem 0}
+code{font:12.5px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;
+     background:var(--refbg);padding:.1rem .3rem;border-radius:4px}
+footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);
+       color:var(--muted);font-size:12.5px}
+a{color:var(--accent)}
+</style>
+</head><body><main>
+  <h1>Cortex-Bench leaderboard</h1>
+  <p class="tagline">Text-to-SQL over a 22-table, 63-million-row synthetic Indian wealth-management
+  warehouse. 200 questions across 9 tiers, 190 execution-scored.</p>
+
+  <div class="note"><strong>Every score here is a mean over repeated runs, and the spread is
+  printed next to it.</strong> We measured two identical runs of the same agent &mdash; same model,
+  same questions, temperature&nbsp;0 &mdash; disagreeing on 21% of tasks. A single-run leaderboard
+  number implies a precision that does not exist, so three runs are mandatory and every run's score
+  is published in the entry file.</div>
+
+  <h2>Snapshot <code>wm_synthetic_v1.3_2026_09_01</code></h2>
+  <p class="legend">Gold answers are bound to the data snapshot; entries scored against different
+  snapshots are listed under separate headings and must not be compared. Here, all rows scored over 190 gradable tasks.</p>
+  <div class="wrap"><table>
+    <thead><tr>
+      <th>#</th><th>System</th><th>Organization</th><th>Model</th>
+      <th title="Execution accuracy: mean over all runs, with standard deviation.">EX (mean &plusmn; sd)</th>
+      <th title="Tasks passed at least once / tasks passed on every run.">pass@N / pass^N</th>
+      <th title="Tasks attempted out of the board denominator.">Coverage</th>
+      <th title="Fraction of sessions where every turn passed.">Session</th>
+      <th title="Accuracy on the 41 multi-turn tier-9 turns.">Multi&#8209;turn</th>
+      <th>USD/task</th><th>Median s</th><th>Verification</th><th>Evaluated</th>
+    </tr></thead>
+    <tbody>
+      <tr class="refrow">
+        <td class="rank">&mdash;</td>
+        <td class="sys"><strong>Null floor (answer nothing)</strong>
+            <div class="sub">1.0</div></td>
+        <td>Cortex-Bench organizers</td>
+        <td>&mdash;<div class="sub">none</div></td>
+        <td class="ex" title="single run">4.7%</td>
+        <td><span class="na">&mdash;</span></td>
+        <td>190/190</td>
+        <td><span class="na" title="not measured">&mdash;</span></td>
+        <td><span class="na" title="not measured">&mdash;</span></td>
+        <td>0.0000</td>
+        <td>0.0</td>
+        <td><span class="v-yes" title="Executed by the organizers.">&#9679; organizer-run</span></td>
+        <td class="sub">2026-09-01</td>
+      </tr>
+      <tr class="">
+        <td class="rank">1</td>
+        <td class="sys"><strong>LangChain SQL agent</strong>
+            <div class="sub">langchain create_sql_agent, default toolkit</div></td>
+        <td>Cortex-Bench organizers (reference implementation)</td>
+        <td>gpt-5.6-luna<div class="sub">api</div></td>
+        <td class="ex" title="53.7%, 51.6%, 54.7%">53.3% <span class="pm">&plusmn;1.6</span></td>
+        <td><span title="Passed at least once: 117. Passed every run: 86. 31 tasks flipped verdict between identical runs.">117 / 86</span></td>
+        <td><span class="warn" title="Did not attempt 41 tasks; they are scored as failures.">149/190</span></td>
+        <td>64.5% <span class="pm">&plusmn;1.9</span></td>
+        <td>0.0%</td>
+        <td>0.0049</td>
+        <td>20.4</td>
+        <td><span class="v-yes" title="Executed by the organizers.">&#9679; organizer-run</span></td>
+        <td class="sub">2026-09-01</td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <h2>By tier</h2>
+  <table class="tiers">
+    <thead><tr><th>System</th><th title="Schema linking">T1</th><th title="Single-table filter">T2</th><th title="Joins">T3</th><th title="Aggregation">T4</th><th title="Window / ranking">T5</th><th title="Domain computation">T6</th><th title="Unanswerable / null-result">T7</th><th title="Multi-turn session">T9</th></tr></thead>
+    <tbody>
+      <tr><td class="sys">Null floor (answer nothing)</td><td class="hot">0</td><td class="hot">0</td><td class="hot">0</td><td class="hot">0</td><td class="hot">0</td><td class="hot">0</td><td class="">90</td><td class="hot">0</td></tr>
+      <tr><td class="sys">LangChain SQL agent</td><td class="">79</td><td class="">87</td><td class="">84</td><td class="">79</td><td class="">76</td><td class="hot">27</td><td class="hot">23</td><td class="hot">0</td></tr>
+    </tbody>
+  </table>
+  <p class="legend">T1 Schema linking &middot; T2 Single-table filter &middot; T3 Joins &middot; T4 Aggregation &middot; T5 Window / ranking &middot; T6 Domain computation &middot; T7 Unanswerable / null-result &middot; T9 Multi-turn session. Values are % correct, averaged over all runs.</p>
+  <p class="note"><strong>Answering nothing beats every system on <strong>tier 7</strong> &mdash; floor 90% vs best system 23%.</strong>
+  On tier 7 that is partly by design &mdash; the correct answer to an unanswerable question really
+  is "no rows", and a system that hallucinates a plausible result is meant to lose. But 9 of the 10
+  tier-7 questions are zero-row, which makes silence a viable strategy on that tier rather than
+  merely a correct answer to one question, and it is being rebalanced. It is logged in
+  <a href="https://github.com/jjayeshneo/Cortex-Benchmark/blob/main/ERRATA.md">ERRATA.md</a>. Anywhere else this sentence names a tier,
+  read it as a defect in the benchmark rather than a fact about the systems.</p>
+
+  <h2>How to read this board</h2>
+  <ul>
+    <li><strong>The denominator never changes.</strong> A system that attempts 149 of 190 tasks is
+      scored out of 190; the skipped tasks count as failures and the coverage column says so.
+      Skipping work must not raise a score.</li>
+    <li><strong>pass@N / pass^N</strong> is the honest measure of stability: how many tasks the
+      system got right at least once, versus on every single run. The gap is churn.</li>
+    <li><strong>The null floor is a row, not a footnote.</strong> It answers nothing at all. Any
+      system that does not clearly beat it has told you nothing.</li>
+    <li><strong>A dash is not a zero.</strong> Hover it for why the metric was not measured.</li>
+  </ul>
+
+  <h2>Not on this board yet</h2>
+  <ul>
+    <li><strong>Human baseline.</strong> Not yet run. Until it exists the board has no ceiling, and
+      no reader can tell whether 53% is close to the limit or nowhere near it.</li>
+    <li><strong>Single-call schema-only baseline.</strong> Not yet run.</li>
+    <li><strong>Our own agent.</strong> Its captured runs predate the v1.2 data repair and its
+      emitted SQL is not re-executable, so it has no honest score on this snapshot. It will appear
+      when it has been re-run, through the same path as every other entry.</li>
+  </ul>
+
+  <h2>Submitting</h2>
+  <p>Add one JSON file to <code>results/</code>, named for its <code>entry_id</code>, and open a
+  pull request. CI validates it against <code>schema/leaderboard_entry.schema.json</code> and
+  rebuilds this page on merge. Run
+  <code>python3 leaderboard/validate_entry.py results/your-entry.json</code> first.</p>
+
+  <footer>
+    Built 2026-09-01 12:39 UTC from 2 entries in
+    <code>results/</code>. This page is generated &mdash; edit the JSON, never the HTML.
+    Provenance for any row: <code>git log results/&lt;entry-id&gt;.json</code>.
+  </footer>
+</main></body></html>
