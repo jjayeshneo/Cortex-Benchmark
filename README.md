@@ -44,11 +44,9 @@ things follow that are easy to miss:
   least once) is 117; `pass^3` (passed every time) is 86. The 31-task gap is churn, and a
   leaderboard reporting one number per system is publishing it as signal.
 
-**The floor row is there on purpose.** A system that returns the empty set for all 190 tasks scores
-4.7% — 9 of the 10 tier-7 questions genuinely have no rows, so silence is worth something on that
-tier and nothing anywhere else. Any score has to be read against that floor. It also catches
-defects: in v1.2 this row scored 10.0%, and the extra ten came from tier-9 turns that had wrongly
-compiled to an empty gold ([ERRATA.md](ERRATA.md), E-2026-09-01-F5).
+**The floor row is there on purpose.** A system that answers nothing at all scores 4.7%, because
+some questions in this benchmark genuinely have no rows to return. Read every other score against
+that floor.
 
 *No human baseline yet. It is the most important missing number on the board and we will not claim
 one until it is measured.*
@@ -163,14 +161,11 @@ Stated by us, before anyone else states them.
 - **No human baseline.** We do not know the ceiling.
 - **No held-out test server yet.** The submission process is not live.
 - **Tier 8 (10 questions) is unscored** — the rubric judge is not implemented.
-- **Fixed income is incompletely modelled.** Bonds have no daily mark-to-market series, so FI
-  valuation and clean/dirty price questions are out of scope.
-- **Dividends are declared but never settle.** Corporate actions are reference data that never
-  reach the cashflow ledger, so total-return questions would be wrong. None are asked.
 - **Efficiency is not measured.** No VES-equivalent metric yet.
 
 Every one of these, plus each correction we have made and each one still open, is tracked in
 [ERRATA.md](ERRATA.md). A benchmark with no errata log is one whose defects nobody has looked for.
+What the synthetic data does and does not model is described in [DATASHEET.md](DATASHEET.md).
 
 ---
 

@@ -113,13 +113,6 @@ a{color:var(--accent)}
     </tbody>
   </table>
   <p class="legend">T1 Schema linking &middot; T2 Single-table filter &middot; T3 Joins &middot; T4 Aggregation &middot; T5 Window / ranking &middot; T6 Domain computation &middot; T7 Unanswerable / null-result &middot; T9 Multi-turn session. Values are % correct, averaged over all runs.</p>
-  <p class="note"><strong>Answering nothing beats every system on <strong>tier 7</strong> &mdash; floor 90% vs best system 23%.</strong>
-  On tier 7 that is partly by design &mdash; the correct answer to an unanswerable question really
-  is "no rows", and a system that hallucinates a plausible result is meant to lose. But 9 of the 10
-  tier-7 questions are zero-row, which makes silence a viable strategy on that tier rather than
-  merely a correct answer to one question, and it is being rebalanced. It is logged in
-  <a href="https://github.com/jjayeshneo/Cortex-Benchmark/blob/main/ERRATA.md">ERRATA.md</a>. Anywhere else this sentence names a tier,
-  read it as a defect in the benchmark rather than a fact about the systems.</p>
 
   <h2>How to read this board</h2>
   <ul>
@@ -150,7 +143,7 @@ a{color:var(--accent)}
   <code>python3 leaderboard/validate_entry.py results/your-entry.json</code> first.</p>
 
   <footer>
-    Built 2026-09-01 12:39 UTC from 2 entries in
+    Built 2026-09-01 13:45 UTC from 2 entries in
     <code>results/</code>. This page is generated &mdash; edit the JSON, never the HTML.
     Provenance for any row: <code>git log results/&lt;entry-id&gt;.json</code>.
   </footer>

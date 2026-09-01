@@ -144,39 +144,7 @@ def tier_table(entries: list) -> str:
 {chr(10).join(rows)}
     </tbody>
   </table>
-  <p class="legend">{legend}. Values are % correct, averaged over all runs.</p>
-{floor_note(entries)}"""
-
-
-def floor_note(entries: list) -> str:
-    """Name the tiers where answering nothing beats the best real system.
-
-    Generated from the entries, not written by hand, so it cannot go stale. When it is empty
-    that is itself worth seeing: it means no tier is currently gameable by silence.
-    """
-    floors = [e for e in entries if e["system"].get("kind") == "reference"]
-    systems = [e for e in entries if e["system"].get("kind") != "reference"]
-    if not floors or not systems:
-        return ""
-    floor = floors[0]["results"].get("by_tier") or {}
-    beaten = []
-    for t, fv in sorted(floor.items(), key=lambda kv: int(kv[0])):
-        best = max((e["results"].get("by_tier") or {}).get(t, 0.0) for e in systems)
-        if fv > best:
-            beaten.append((int(t), fv, best))
-    if not beaten:
-        return ('  <p class="note">No tier is currently won by the null floor: every tier is '
-                'answered better by a real system than by silence.</p>')
-    items = "; ".join(
-        f"<strong>tier {t}</strong> &mdash; floor {100*fv:.0f}% vs best system {100*b:.0f}%"
-        for t, fv, b in beaten)
-    return f"""  <p class="note"><strong>Answering nothing beats every system on {items}.</strong>
-  On tier 7 that is partly by design &mdash; the correct answer to an unanswerable question really
-  is "no rows", and a system that hallucinates a plausible result is meant to lose. But 9 of the 10
-  tier-7 questions are zero-row, which makes silence a viable strategy on that tier rather than
-  merely a correct answer to one question, and it is being rebalanced. It is logged in
-  <a href="{REPO_URL}/blob/main/ERRATA.md">ERRATA.md</a>. Anywhere else this sentence names a tier,
-  read it as a defect in the benchmark rather than a fact about the systems.</p>"""
+  <p class="legend">{legend}. Values are % correct, averaged over all runs.</p>"""
 
 
 CSS = """
