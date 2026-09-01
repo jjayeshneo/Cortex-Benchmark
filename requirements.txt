@@ -1,0 +1,6 @@
+# Everything needed to score a submission. Three packages, all only for the scorer:
+# prepare_sample_gold.py, leaderboard/ and tools/ are pure standard library on purpose, so the
+# leak check and the leaderboard build can run in CI with nothing installed.
+duckdb>=1.0
+pandas>=2.0
+numpy>=1.24

@@ -60,7 +60,8 @@ one until it is measured.*
 Five minutes. No API key, no model calls.
 
 ```bash
-git clone <this repo> && cd cortex-bench
+git clone https://github.com/jjayeshneo/Cortex-Benchmark.git && cd Cortex-Benchmark
+pip install -r requirements.txt          # duckdb, pandas, numpy — the scorer's only deps
 
 ./data/download.sh                       # 1.07 GB from GitHub releases, verifies sha256
 
