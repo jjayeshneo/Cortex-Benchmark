@@ -29,8 +29,16 @@ generated from `results/*.json`, one committed file per row.
 
 | | System | Model | Pass^N | Pass@N | EX (mean ± sd) | Runs | Snapshot |
 |---|---|---|---|---|---|---|---|
-| 1 | LangChain SQL agent | gpt-5.6-luna | **57.7%** | 78.5% | 53.3% ± 1.6 | 3 | v1.3 |
+| 1 | CrewAI role-based crew | gpt-5.6-luna † | **60.4%** | 72.5% | 52.6% ± 1.1 | 3 | v1.3 |
+| 2 | LangChain SQL agent | gpt-5.6-luna | **57.7%** | 78.5% | 53.3% ± 1.6 | 3 | v1.3 |
 | — | *Neo-Cortex* | *gpt-5.6-luna* | *57.0%* | *71.1%* | *50.3% ± 2.6* | 2 | **v1.1** |
+
+† The crew runs with `reasoning_effort=none`. gpt-5.6-luna is a reasoning model and OpenAI refuses
+function tools alongside reasoning on `/v1/chat/completions`; the LangChain arm keeps reasoning via
+the Responses API, but CrewAI 1.15.2's Responses support cannot carry a tool loop. Everything else
+is held identical — same 149 task ids, same grounding string, same schema, same snapshot, same
+runner, same scorer — so the top two rows differ by scaffold **and** by that one model setting. Read
+the ordering with that in mind.
 
 **The board ranks on Pass^N — a task counts only if the system solves it on every run.** Three
 things follow that are easy to miss:
@@ -40,9 +48,10 @@ things follow that are easy to miss:
   **190**, where an unattempted task counts as a failure — so declining the hard questions still
   costs you. Both systems attempted the same 149 single-turn tasks.
 - **Ranking on the average would reward unreliability.** LangChain solves 117 of 149 tasks at least
-  once but only 86 of them every time: **31 tasks (21%) change verdict between identical runs** at
-  temperature 0. That gap is churn, and a leaderboard reporting one number per system is publishing
-  it as signal.
+  once but only 86 of them every time: **31 tasks (21%) change verdict between identical runs**.
+  The crew churns less — 18 tasks (12%) — which is most of why it leads on Pass^N while trailing on
+  Pass@N. That gap is churn, and a leaderboard reporting one number per system is publishing it as
+  signal.
 - **Snapshots never mix in a ranking.** Neo-Cortex was measured against the v1.1 snapshot, so its
   figures are real but not comparable with the ranked row, and it takes no rank. Gold answers are
   bound to the snapshot they were compiled against, and its captured SQL cannot be replayed onto a

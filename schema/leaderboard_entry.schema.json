@@ -125,6 +125,13 @@
             "null"
           ],
           "description": "true if the submitter controls the weights; false for a hosted endpoint that may change under them."
+        },
+        "config_note": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Short, reader-facing note when this row's model was configured differently from other rows on the same model -- reasoning effort, context window, endpoint. Rendered on the board next to the model name, because two rows sharing a model name but not a configuration are not a scaffold-only comparison and a reader cannot tell from the numbers alone."
         }
       }
     },

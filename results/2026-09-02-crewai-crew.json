@@ -1,0 +1,117 @@
+{
+  "entry_id": "2026-09-02-crewai-crew",
+  "system": {
+    "name": "CrewAI role-based crew",
+    "version": "crewai 1.15.2, sequential crew (SQL Analyst + Query Validator)",
+    "organization": "Cortex-Bench organizers (reference implementation)",
+    "url": null,
+    "paper": null,
+    "code": null,
+    "open_source": true,
+    "kind": "framework"
+  },
+  "model": {
+    "name": "gpt-5.6-luna",
+    "provider": "OpenAI",
+    "access": "api",
+    "training_cutoff": null,
+    "temperature": null,
+    "controlled": false,
+    "config_note": "reasoning_effort=none (required for tool use on this model in CrewAI)"
+  },
+  "protocol": {
+    "split": "full",
+    "corpus_version": "v1.3",
+    "data_snapshot_id": "wm_synthetic_v1.3_2026_09_01",
+    "scorer_version": "cortex_scorer_v1.6",
+    "runs": 3,
+    "denominator": 190,
+    "attempted": 149,
+    "evidence_provided": true,
+    "verified_by_organizers": true,
+    "evaluated_at": "2026-09-02T19:02:10Z"
+  },
+  "results": {
+    "execution_accuracy": {
+      "mean": 0.526316,
+      "n": 100,
+      "std": 0.010526,
+      "runs": [
+        0.526316,
+        0.536842,
+        0.515789
+      ]
+    },
+    "session_accuracy": {
+      "mean": 0.636943,
+      "std": 0.012739,
+      "runs": [
+        0.636943,
+        0.649682,
+        0.624204
+      ]
+    },
+    "multi_turn_session_accuracy": {
+      "mean": 0.0,
+      "runs": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unavailable_reason": null
+    },
+    "multi_turn_turn_accuracy": {
+      "mean": 0.0,
+      "runs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "pass_any": {
+      "mean": 0.724832,
+      "n": 108
+    },
+    "pass_all": {
+      "mean": 0.604027,
+      "n": 90
+    },
+    "cost_usd_per_task": {
+      "mean": 0.004239,
+      "std": 0.000123,
+      "runs": [
+        0.004132,
+        0.004221,
+        0.004368
+      ]
+    },
+    "tokens_per_task": {
+      "mean": 15172.7,
+      "std": 411.0,
+      "runs": [
+        14884.0,
+        14992.1,
+        15642.0
+      ]
+    },
+    "median_latency_s": {
+      "mean": 8.0
+    },
+    "by_tier": {
+      "1": 0.7143,
+      "2": 0.8667,
+      "3": 0.6286,
+      "4": 0.6,
+      "5": 0.6667,
+      "6": 0.2,
+      "7": 0.9
+    }
+  },
+  "declarations": {
+    "canary_check": "not-applicable",
+    "test_data_seen": false,
+    "human_in_loop": false,
+    "artifacts": "runs/crewai_run{1,2,3}.jsonl and runs/crewai_run{1,2,3}_score/ (organizer-side; per-task SQL, verdict, latency, token counts and cost for all three runs)",
+    "notes": "Single-turn only: the 41 tier-9 multi-turn turns were not attempted and are scored as failures, which is why execution accuracy over the 190-task denominator sits far below the single-turn subset figure of 67.1%. All three runs answered 149/149 with no refusal and no SQL error. MODEL CONFIGURATION DIFFERS FROM THE LANGCHAIN ROW: gpt-5.6-luna is a reasoning model, and OpenAI rejects function tools alongside reasoning on /v1/chat/completions. The LangChain arm keeps reasoning by using the Responses API; CrewAI 1.15.2's Responses support is single-turn only and cannot carry a tool loop, so this arm runs with reasoning_effort='none' via CrewAI's supported additional_params passthrough. Both arms are otherwise identical -- same 149 task ids, same grounding string, same schema, same read-only snapshot, same runner, same scorer -- but the reasoning difference means this row is not a clean scaffold-only comparison with the LangChain row. Token counts are exact crew usage metrics, not estimates."
+  }
+}

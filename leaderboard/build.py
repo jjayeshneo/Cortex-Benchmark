@@ -165,6 +165,11 @@ def board_rows(entries: list, snap: str) -> str:
         descriptive = ver and not ver.replace(".", "").isdigit()
         if e["model"].get("name"):
             model = html.escape(e["model"]["name"]) + (f' &middot; {html.escape(ver)}' if descriptive else "")
+            # A differing model configuration is disclosed on the row itself, not only in the
+            # entry JSON: two rows sharing a model name but not its settings are not a
+            # scaffold-only comparison, and the numbers alone do not reveal that.
+            _cn = (e["model"] or {}).get("config_note")
+            cfg = f' <span class="cfg-note">&middot; {_cn}</span>' if _cn else ""
         elif descriptive:
             model = html.escape(ver)
         else:
@@ -187,7 +192,7 @@ def board_rows(entries: list, snap: str) -> str:
               <span class="band-tick {band}"></span>
               <div>
                 <div class="agent-name">{html.escape(s_['name'])}</div>
-                <div class="agent-arch">{model}</div>
+                <div class="agent-arch">{model}{cfg}</div>
                 <div class="agent-arch">{cov} &middot; {n} run{'s' if n != 1 else ''}</div>
               </div>
             </div>
@@ -364,7 +369,8 @@ CSS = """
   .band-tick.reference{background:var(--reference)}
   .band-tick.legacy{background:var(--legacy)}
   .agent-name{font-weight:600;font-size:15px}
-  .agent-arch{font-size:12px;color:var(--ink-faint);font-family:var(--mono);margin-top:1px}
+  .cfg-note{color:#b45309;font-weight:600}
+.agent-arch{font-size:12px;color:var(--ink-faint);font-family:var(--mono);margin-top:1px}
   .score-cell{display:flex;align-items:center;gap:12px;justify-content:flex-end}
   .score-num{font-family:var(--mono);font-weight:600;font-size:16px;min-width:86px;text-align:right}
   .score-num.lead{color:var(--accent)}
