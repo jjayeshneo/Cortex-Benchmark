@@ -16,8 +16,7 @@
     "access": "api",
     "training_cutoff": null,
     "temperature": null,
-    "controlled": false,
-    "config_note": "reasoning_effort=none (required for tool use on this model in CrewAI)"
+    "controlled": false
   },
   "protocol": {
     "split": "full",
