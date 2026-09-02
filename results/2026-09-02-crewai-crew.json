@@ -1,7 +1,7 @@
 {
   "entry_id": "2026-09-02-crewai-crew",
   "system": {
-    "name": "CrewAI role-based crew",
+    "name": "CrewAI",
     "version": "crewai 1.15.2, sequential crew (SQL Analyst + Query Validator)",
     "organization": "Cortex-Bench organizers (reference implementation)",
     "url": null,

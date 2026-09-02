@@ -29,7 +29,7 @@ generated from `results/*.json`, one committed file per row.
 
 | | System | Model | Pass^N | Pass@N | EX (mean ± sd) | Runs | Snapshot |
 |---|---|---|---|---|---|---|---|
-| 1 | CrewAI role-based crew | gpt-5.6-luna † | **60.4%** | 72.5% | 52.6% ± 1.1 | 3 | v1.3 |
+| 1 | CrewAI | gpt-5.6-luna † | **60.4%** | 72.5% | 52.6% ± 1.1 | 3 | v1.3 |
 | 2 | LangChain SQL agent | gpt-5.6-luna | **57.7%** | 78.5% | 53.3% ± 1.6 | 3 | v1.3 |
 | — | *Neo-Cortex* | *gpt-5.6-luna* | *57.0%* | *71.1%* | *50.3% ± 2.6* | 2 | **v1.1** |
 
