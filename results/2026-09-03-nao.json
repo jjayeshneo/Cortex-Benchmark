@@ -1,0 +1,107 @@
+{
+  "entry_id": "2026-09-03-nao",
+  "system": {
+    "name": "nao",
+    "version": "nao agent with dataset context layer, /api/agent SSE",
+    "organization": "Cortex-Bench organizers (reference implementation)",
+    "url": null,
+    "paper": null,
+    "code": null,
+    "open_source": false,
+    "kind": "agent"
+  },
+  "model": {
+    "name": "gpt-5.6-luna",
+    "provider": "OpenAI",
+    "access": "api",
+    "training_cutoff": null,
+    "temperature": null,
+    "controlled": false
+  },
+  "protocol": {
+    "split": "full",
+    "corpus_version": "v1.3",
+    "data_snapshot_id": "wm_synthetic_v1.3_2026_09_01",
+    "scorer_version": "cortex_scorer_v1.6",
+    "runs": 3,
+    "denominator": 190,
+    "attempted": 149,
+    "evidence_provided": true,
+    "verified_by_organizers": true,
+    "evaluated_at": "2026-09-03T07:22:25Z"
+  },
+  "results": {
+    "execution_accuracy": {
+      "mean": 0.508772,
+      "n": 98,
+      "std": 0.012154,
+      "runs": [
+        0.515789,
+        0.515789,
+        0.494737
+      ]
+    },
+    "session_accuracy": {
+      "mean": 0.615711,
+      "std": 0.01471,
+      "runs": [
+        0.624204,
+        0.624204,
+        0.598726
+      ]
+    },
+    "multi_turn_session_accuracy": {
+      "mean": 0.0,
+      "runs": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unavailable_reason": null
+    },
+    "multi_turn_turn_accuracy": {
+      "mean": 0.0,
+      "runs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "pass_any": {
+      "mean": 0.724832,
+      "n": 108
+    },
+    "pass_all": {
+      "mean": 0.557047,
+      "n": 83
+    },
+    "cost_usd_per_task": {
+      "mean": 0.008123,
+      "std": 0.000288,
+      "runs": [
+        0.008446,
+        0.008031,
+        0.007893
+      ]
+    },
+    "median_latency_s": {
+      "mean": 12.4
+    },
+    "by_tier": {
+      "1": 0.7857,
+      "2": 0.8,
+      "3": 0.6,
+      "4": 0.6,
+      "5": 0.4,
+      "6": 0.08,
+      "7": 1.0
+    }
+  },
+  "declarations": {
+    "canary_check": "not-applicable",
+    "test_data_seen": false,
+    "human_in_loop": false,
+    "artifacts": "runs/nao_run1_fix.jsonl, runs/nao_run2.jsonl, runs/nao_run3.jsonl and runs/nao_run{1,2,3}_score_v1_1/ plus runs/nao_3run_score/ (organizer-side; per-task SQL, verdict, latency and cost for all three runs)",
+    "notes": "Single-turn only: the 41 tier-9 multi-turn turns were not attempted and are scored as failures, which is why execution accuracy over the 190-task denominator sits below the single-turn subset figure. Runs 2 and 3 answered 148/149 and 147/149; run 1 declined 29 tasks, but only 3 tasks are solved by runs 2 and 3 and not by run 1, and none of those 3 were declines, so run 1 is not a degraded run. Token counts are unavailable: nao's SSE endpoint does not surface per-call usage, so tokens_per_task is null rather than estimated. Cost is the sum of nao's own reported per-task cost. Run 1's answers were re-executed against the release snapshot after an earlier run had hit a DuckDB catalog-name mismatch; the agent's generated SQL is unmodified and re-execution is the same path the harness uses for every arm. nao reads a dataset context layer carrying table and column documentation, which the LangChain and CrewAI arms do not, so this row is not a scaffold-only comparison with them."
+  }
+}
