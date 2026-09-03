@@ -1,0 +1,116 @@
+{
+  "entry_id": "2026-09-03-vanna",
+  "system": {
+    "name": "Vanna",
+    "version": "vanna 2.0.2, Agent loop with ToolRegistry(run_sql)",
+    "organization": "Cortex-Bench organizers (reference implementation)",
+    "url": null,
+    "paper": null,
+    "code": null,
+    "open_source": true,
+    "kind": "framework"
+  },
+  "model": {
+    "name": "gpt-5.6-luna",
+    "provider": "OpenAI",
+    "access": "api",
+    "training_cutoff": null,
+    "temperature": null,
+    "controlled": false
+  },
+  "protocol": {
+    "split": "full",
+    "corpus_version": "v1.3",
+    "data_snapshot_id": "wm_synthetic_v1.3_2026_09_01",
+    "scorer_version": "cortex_scorer_v1.6",
+    "runs": 3,
+    "denominator": 190,
+    "attempted": 149,
+    "evidence_provided": true,
+    "verified_by_organizers": true,
+    "evaluated_at": "2026-09-03T11:51:45Z"
+  },
+  "results": {
+    "execution_accuracy": {
+      "mean": 0.570175,
+      "n": 110,
+      "std": 0.010956,
+      "runs": [
+        0.578947,
+        0.557895,
+        0.573684
+      ]
+    },
+    "session_accuracy": {
+      "mean": 0.690021,
+      "std": 0.013259,
+      "runs": [
+        0.700637,
+        0.675159,
+        0.694268
+      ]
+    },
+    "multi_turn_session_accuracy": {
+      "mean": 0.0,
+      "runs": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "unavailable_reason": null
+    },
+    "multi_turn_turn_accuracy": {
+      "mean": 0.0,
+      "runs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "pass_any": {
+      "mean": 0.778523,
+      "n": 116
+    },
+    "pass_all": {
+      "mean": 0.651007,
+      "n": 97
+    },
+    "cost_usd_per_task": {
+      "mean": 0.001925,
+      "std": 0.000014,
+      "runs": [
+        0.001931,
+        0.001909,
+        0.001936
+      ]
+    },
+    "tokens_per_task": {
+      "mean": 7938.4,
+      "std": 46.9,
+      "runs": [
+        7962.0,
+        7884.4,
+        7968.7
+      ]
+    },
+    "median_latency_s": {
+      "mean": 6.2
+    },
+    "by_tier": {
+      "1": 0.7857,
+      "2": 0.8667,
+      "3": 0.7143,
+      "4": 0.6286,
+      "5": 0.6667,
+      "6": 0.24,
+      "7": 1.0
+    }
+  },
+  "declarations": {
+    "canary_check": "not-applicable",
+    "test_data_seen": false,
+    "human_in_loop": false,
+    "artifacts": "runs/vanna2_run{1,2,3}.jsonl and runs/vanna2_run{1,2,3}_score/ plus runs/vanna2_3run_score/ (organizer-side; per-task SQL, verdict, latency, token counts and cost for all three runs)",
+    "notes": "vanna 2.0's NATIVE Agent architecture, not the 0.x RAG scaffold. 2.0.2 still bundles the old VannaBase/submit_prompt API under vanna.legacy and it imports and works, but using it would measure the old scaffold under a new version number, so this arm runs the Agent + ToolRegistry loop that 2.0 actually introduced. Single-turn only: the 41 tier-9 multi-turn turns were not attempted and are scored as failures, which is why execution accuracy over the 190-task denominator sits well below the single-turn subset figure. All three runs answered 149/149 with no refusal, no SQL error and no agent error; run-to-run independence is real, with 124 to 127 of 149 tasks producing different SQL between runs. MODEL CONFIGURATION DIFFERS FROM THE LANGCHAIN ROW, in the same way and for the same reason as the CrewAI row: vanna 2.0 has no text-completion route to SQL (RunSqlTool is always registered and OpenAILlmService always emits tools + tool_choice=auto against chat.completions), and OpenAI rejects function tools alongside reasoning on gpt-5.6-luna, so this arm runs with reasoning_effort='none' via a provider subclass in the adaptor -- vanna itself is not patched. This arm also cannot pin temperature at all: vanna's _build_payload never forwards request.temperature. TWO HONEST CAVEATS. First, the run_sql tool returns up to 1000 rows to the agent where the CrewAI arm's query_database tool returns 20; that asymmetry provably cannot have moved this score, because the agent issued exactly ONE run_sql call per task in all 447 task-runs (agent_steps median and max both 1) and the scored answer comes from the harness re-executing the captured SQL, not from what the agent read. Second, and following from that: this row does not demonstrate agentic self-correction. The agent never issued a corrected second query, so what is measured here is 2.0's schema and prompt handling in a single shot, not its tool loop. The chromadb AgentMemory is created per task in a temporary directory and discarded, so no task can retrieve a previous task's queries. Token counts are exact usage from the provider, not estimates."
+  }
+}

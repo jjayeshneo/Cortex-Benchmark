@@ -229,6 +229,32 @@ function toggleTheme(){
             <div class="agent-cell">
               <span class="band-tick measured"></span>
               <div>
+                <div class="agent-name">Vanna</div>
+                <div class="agent-arch">gpt-5.6-luna &middot; vanna 2.0.2, Agent loop with ToolRegistry(run_sql)</div>
+                <div class="agent-arch"><span class="warn" title="Did not attempt 41 of 190 tasks; they are scored as failures.">149/190 attempted</span> &middot; 3 runs</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="band-pill measured">Measured</span></td>
+          <td class="num" title="runs: 57.9%, 55.8%, 57.4%">
+            <div class="score-cell">
+              <span class="bar"><span class="lead" style="width:100.0%"></span></span>
+              <span class="score-num lead">65.1%</span>
+            </div>
+            <div class="score-sub">EX 57.0%<span class="pm"> &plusmn;1.1</span></div>
+          </td>
+          <td class="num sub-num">77.9%</td>
+          <td class="num sub-num">6.2s</td>
+          <td class="num sub-num">7,938</td>
+          <td class="num sub-num">$0.0019</td>
+          <td class="num sub-num">$0.0030</td>
+        </tr>
+        <tr class="measured">
+          <td class="rank">2</td>
+          <td>
+            <div class="agent-cell">
+              <span class="band-tick measured"></span>
+              <div>
                 <div class="agent-name">CrewAI</div>
                 <div class="agent-arch">gpt-5.6-luna &middot; crewai 1.15.2, sequential crew (SQL Analyst + Query Validator)</div>
                 <div class="agent-arch"><span class="warn" title="Did not attempt 41 of 190 tasks; they are scored as failures.">149/190 attempted</span> &middot; 3 runs</div>
@@ -238,8 +264,8 @@ function toggleTheme(){
           <td><span class="band-pill measured">Measured</span></td>
           <td class="num" title="runs: 53.2%, 54.2%, 52.1%">
             <div class="score-cell">
-              <span class="bar"><span class="lead" style="width:100.0%"></span></span>
-              <span class="score-num lead">61.1%</span>
+              <span class="bar"><span class="" style="width:93.8%"></span></span>
+              <span class="score-num">61.1%</span>
             </div>
             <div class="score-sub">EX 53.2%<span class="pm"> &plusmn;1.1</span></div>
           </td>
@@ -250,7 +276,7 @@ function toggleTheme(){
           <td class="num sub-num">$0.0069</td>
         </tr>
         <tr class="measured">
-          <td class="rank">2</td>
+          <td class="rank">3</td>
           <td>
             <div class="agent-cell">
               <span class="band-tick measured"></span>
@@ -264,7 +290,7 @@ function toggleTheme(){
           <td><span class="band-pill measured">Measured</span></td>
           <td class="num" title="runs: 53.7%, 51.6%, 54.7%">
             <div class="score-cell">
-              <span class="bar"><span class="" style="width:94.5%"></span></span>
+              <span class="bar"><span class="" style="width:88.7%"></span></span>
               <span class="score-num">57.7%</span>
             </div>
             <div class="score-sub">EX 53.3%<span class="pm"> &plusmn;1.6</span></div>
@@ -276,7 +302,7 @@ function toggleTheme(){
           <td class="num sub-num">$0.0084</td>
         </tr>
         <tr class="measured">
-          <td class="rank">3</td>
+          <td class="rank">4</td>
           <td>
             <div class="agent-cell">
               <span class="band-tick measured"></span>
@@ -290,7 +316,7 @@ function toggleTheme(){
           <td><span class="band-pill measured">Measured</span></td>
           <td class="num" title="runs: 51.6%, 51.6%, 49.5%">
             <div class="score-cell">
-              <span class="bar"><span class="" style="width:91.2%"></span></span>
+              <span class="bar"><span class="" style="width:85.6%"></span></span>
               <span class="score-num">55.7%</span>
             </div>
             <div class="score-sub">EX 50.9%<span class="pm"> &plusmn;1.2</span></div>
@@ -316,7 +342,7 @@ function toggleTheme(){
           <td><span class="band-pill legacy">Legacy &middot; v1.1</span></td>
           <td class="num" title="runs: 48.4%, 52.1%">
             <div class="score-cell">
-              <span class="bar"><span class="" style="width:93.4%"></span></span>
+              <span class="bar"><span class="" style="width:87.6%"></span></span>
               <span class="score-num">57.0%</span>
             </div>
             <div class="score-sub">EX 50.3%<span class="pm"> &plusmn;2.6</span></div>
@@ -359,6 +385,7 @@ function toggleTheme(){
       <table class="breakdown">
         <thead><tr><th>System</th><th class="num" title="Schema linking">T1</th><th class="num" title="Single-table filter">T2</th><th class="num" title="Joins">T3</th><th class="num" title="Aggregation">T4</th><th class="num" title="Window / ranking">T5</th><th class="num" title="Domain computation">T6</th><th class="num" title="Unanswerable / null-result">T7</th></tr></thead>
         <tbody>
+        <tr><td>Vanna</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 33%, transparent)">79</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">87</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 27%, transparent)">63</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">67</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">24</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">100</span></td></tr>
         <tr><td>CrewAI</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">87</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 27%, transparent)">63</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 27%, transparent)">63</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">67</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 13%, transparent)">20</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 37%, transparent)">90</span></td></tr>
         <tr><td>LangChain SQL agent</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">74</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 24%, transparent)">53</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 13%, transparent)">20</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">10</span></td></tr>
         <tr><td>nao</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 33%, transparent)">79</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 33%, transparent)">80</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 26%, transparent)">60</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 26%, transparent)">60</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 20%, transparent)">40</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">100</span></td></tr>
@@ -380,8 +407,8 @@ function toggleTheme(){
        reliable and fast. Correctness alone is not the whole picture on a 58-million-row database &mdash; a query
        that returns the right answer in six minutes is not a usable one.</p>
     <div class="scatter-grid">
-<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="USD per task against Pass^N"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0.0000</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">0.0025</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">0.0051</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">0.0076</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">0.0102</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">18%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">37%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">55%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">73%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Pass^N</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">USD per task</text><circle class="pt measured" cx="574.3" cy="85.6" r="6.5"/><text class="pt-label" x="563.3" y="83.6" text-anchor="end">nao</text><text class="pt-sub" x="563.3" y="96.6" text-anchor="end">55.7% &middot; 0.0081</text><circle class="pt measured" cx="592.8" cy="190.9" r="6.5"/><text class="pt-label" x="581.8" y="188.9" text-anchor="end">LangChain SQL agent</text><text class="pt-sub" x="581.8" y="201.9" text-anchor="end">57.7% &middot; 0.0049</text><circle class="pt measured" cx="623.7" cy="211.1" r="6.5"/><text class="pt-label" x="612.7" y="209.1" text-anchor="end">CrewAI</text><text class="pt-sub" x="612.7" y="222.1" text-anchor="end">61.1% &middot; 0.0042</text></svg></div>
-<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="Median seconds against Pass^N"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">6</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">13</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">19</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">26</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">18%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">37%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">55%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">73%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Pass^N</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">Median seconds</text><circle class="pt measured" cx="592.8" cy="85.6" r="6.5"/><text class="pt-label" x="581.8" y="83.6" text-anchor="end">LangChain SQL agent</text><text class="pt-sub" x="581.8" y="96.6" text-anchor="end">57.7% &middot; 21</text><circle class="pt measured" cx="574.3" cy="190.9" r="6.5"/><text class="pt-label" x="563.3" y="188.9" text-anchor="end">nao</text><text class="pt-sub" x="563.3" y="201.9" text-anchor="end">55.7% &middot; 12</text><circle class="pt measured" cx="623.7" cy="246.6" r="6.5"/><text class="pt-label" x="612.7" y="244.6" text-anchor="end">CrewAI</text><text class="pt-sub" x="612.7" y="257.6" text-anchor="end">61.1% &middot; 8</text></svg></div>
+<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="USD per task against Pass^N"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0.0000</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">0.0025</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">0.0051</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">0.0076</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">0.0102</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">20%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">39%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">59%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">78%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Pass^N</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">USD per task</text><circle class="pt measured" cx="542.6" cy="85.6" r="6.5"/><text class="pt-label" x="531.6" y="83.6" text-anchor="end">nao</text><text class="pt-sub" x="531.6" y="96.6" text-anchor="end">55.7% &middot; 0.0081</text><circle class="pt measured" cx="560.0" cy="190.9" r="6.5"/><text class="pt-label" x="549.0" y="188.9" text-anchor="end">LangChain SQL agent</text><text class="pt-sub" x="549.0" y="201.9" text-anchor="end">57.7% &middot; 0.0049</text><circle class="pt measured" cx="588.9" cy="211.1" r="6.5"/><text class="pt-label" x="577.9" y="209.1" text-anchor="end">CrewAI</text><text class="pt-sub" x="577.9" y="222.1" text-anchor="end">61.1% &middot; 0.0042</text><circle class="pt measured" cx="623.7" cy="285.8" r="6.5"/><text class="pt-label" x="612.7" y="283.8" text-anchor="end">Vanna</text><text class="pt-sub" x="612.7" y="296.8" text-anchor="end">65.1% &middot; 0.0019</text></svg></div>
+<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="Median seconds against Pass^N"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">6</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">13</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">19</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">26</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">20%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">39%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">59%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">78%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Pass^N</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">Median seconds</text><circle class="pt measured" cx="560.0" cy="85.6" r="6.5"/><text class="pt-label" x="549.0" y="83.6" text-anchor="end">LangChain SQL agent</text><text class="pt-sub" x="549.0" y="96.6" text-anchor="end">57.7% &middot; 21</text><circle class="pt measured" cx="542.6" cy="190.9" r="6.5"/><text class="pt-label" x="531.6" y="188.9" text-anchor="end">nao</text><text class="pt-sub" x="531.6" y="201.9" text-anchor="end">55.7% &middot; 12</text><circle class="pt measured" cx="588.9" cy="246.6" r="6.5"/><text class="pt-label" x="577.9" y="244.6" text-anchor="end">CrewAI</text><text class="pt-sub" x="577.9" y="257.6" text-anchor="end">61.1% &middot; 8</text><circle class="pt measured" cx="623.7" cy="269.4" r="6.5"/><text class="pt-label" x="612.7" y="267.4" text-anchor="end">Vanna</text><text class="pt-sub" x="612.7" y="280.4" text-anchor="end">65.1% &middot; 6</text></svg></div>
     </div>
     <p class="note">Latency and cost come from the live agent runs. Neither is currently folded into
        the score: an efficiency metric in the spirit of BIRD's VES is on the roadmap, and until it
@@ -411,7 +438,7 @@ function toggleTheme(){
         the data does and does not model is in
         <a href="https://github.com/jjayeshneo/Cortex-Benchmark/blob/main/DATASHEET.md">DATASHEET.md</a>.
         <br><br>
-        <span class="tag">Built 2026-09-03 07:37 UTC from 4 entries.</span>
+        <span class="tag">Built 2026-09-03 11:53 UTC from 5 entries.</span>
       </p>
     </div>
   </div>
