@@ -612,6 +612,14 @@ def build(entries: list) -> str:
     <p class="note">Latency and cost come from the live agent runs. Neither is currently folded into
        the score: an efficiency metric in the spirit of BIRD's VES is on the roadmap, and until it
        exists a slow correct answer ranks exactly like a fast one.</p>
+    <p class="note"><strong>Cost is not one meter.</strong> These figures are comparable within a
+       band, not across the column. The gpt-5.6-luna rows are billed per token and measured per
+       task. Claude Code's is API-equivalent rather than billed &mdash; nothing was charged.
+       Snowflake Cortex Analyst reports no per-request cost at all, so its figure is derived from
+       account-level credit metering across a whole day and assumes an edition rate; a different
+       edition moves it by a third in either direction. Each row's <code>notes</code> field in
+       <code>results/</code> states exactly how its number was obtained. Read them before
+       quoting a ratio between two rows.</p>
   </div>
 </section>
 
