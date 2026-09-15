@@ -43,6 +43,38 @@ are listed so that a later decision is visible as a change rather than a surpris
 
 ## Fixed
 
+### E-2026-09-15-12 — The LangChain row was scored against a different gold than every other row
+**Severity: high. Affects: `results/2026-09-01-langchain-sql-agent.json`, and the README table.**
+
+One gold answer, on a tier-4 task, was corrected earlier: the question attributes new clients via
+the acquiring advisor, while the compiled gold had used the primary advisor. The corrected answer
+returns 72 rows where the original returned 94.
+
+The LangChain row was scored **before** that correction landed and was never re-scored. CrewAI,
+nao, Vanna and Claude Code were all scored after it. Read from each row's own scored output, the
+expected row count on that task is 72 for four systems and 94 for LangChain alone — so the board
+was not on a single basis, and the one row that differed was the one published earliest.
+
+All three of LangChain's published captures return 72 rows on that task, so it passes against the
+corrected gold. Re-scoring the same three submissions — no new capture, no new inference — changes
+exactly one task and nothing else:
+
+    pass_all   86/149 (57.7%)  ->  87/149 (58.4%)
+    pass_any  117/149 (78.5%)  -> 118/149 (79.2%)
+    EX runs    0.536842, 0.515789, 0.547368  ->  0.542105, 0.521053, 0.552632
+    tier 4     0.7143  ->  0.7429
+
+**Fixed** by re-scoring and republishing the row. Every published row is now scored against the
+same gold.
+
+Two process notes, because the failure was in the checking rather than the scoring. First, an
+earlier internal review concluded that no re-score was owed, on the strength of a capture file
+that returned 70 rows — but that file was a pre-v1.3 capture, not the one this row is built from
+and cites. A row's numbers must be checked against the artifacts the row itself names. Second,
+a correction's effect on a score is to be read off the scored output, never derived by reasoning
+about what the fix ought to do.
+
+
 ### E-2026-09-01-F5 — Ten tier-9 turns compiled to an empty gold answer
 **Fixed in data snapshot `wm_synthetic_v1.3_2026_09_01`.** Two independent causes, one in the data
 and one in a question.

@@ -29,16 +29,26 @@ generated from `results/*.json`, one committed file per row.
 
 | | System | Model | Pass^N | Pass@N | EX (mean ± sd) | Runs | Snapshot |
 |---|---|---|---|---|---|---|---|
-| 1 | CrewAI | gpt-5.6-luna † | **60.4%** | 72.5% | 52.6% ± 1.1 | 3 | v1.3 |
-| 2 | LangChain SQL agent | gpt-5.6-luna | **57.7%** | 78.5% | 53.3% ± 1.6 | 3 | v1.3 |
+| 1 ‡ | Claude Code | Claude Sonnet ‡ | **79.2%** | 91.9% | 67.0% ± 0.8 | 3 | v1.3 |
+| 2 ‡ | Snowflake Cortex Analyst | managed, undisclosed ‡ | **71.1%** | 78.5% | 59.1% ± 0.8 | 3 | v1.3 |
+| 1 | Vanna | gpt-5.6-luna | **65.1%** | 77.9% | 57.0% ± 1.1 | 3 | v1.3 |
+| 2 | CrewAI | gpt-5.6-luna † | **61.1%** | 73.1% | 53.2% ± 1.1 | 3 | v1.3 |
+| 3 | LangChain SQL agent | gpt-5.6-luna | **58.4%** | 79.2% | 53.9% ± 1.6 | 3 | v1.3 |
+| 4 | nao | gpt-5.6-luna | **55.7%** | 72.5% | 50.9% ± 1.2 | 3 | v1.3 |
 | — | *Neo-Cortex* | *gpt-5.6-luna* | *57.0%* | *71.1%* | *50.3% ± 2.6* | 2 | **v1.1** |
+
+‡ **Two bands, ranked separately.** Rows 1–4 are the *controlled* arm: different scaffolds over
+one fixed base model, so the ordering is a scaffold comparison. The ‡ rows are the *commercial*
+band — shipped products that bring their own model, which is not disclosed in Snowflake's case.
+A ‡ row above a numbered row is not evidence that its scaffold is better; it is a different
+system with a different model. Never read one ranking across both bands.
 
 † The crew runs with `reasoning_effort=none`. gpt-5.6-luna is a reasoning model and OpenAI refuses
 function tools alongside reasoning on `/v1/chat/completions`; the LangChain arm keeps reasoning via
 the Responses API, but CrewAI 1.15.2's Responses support cannot carry a tool loop. Everything else
 is held identical — same 149 task ids, same grounding string, same schema, same snapshot, same
-runner, same scorer — so the top two rows differ by scaffold **and** by that one model setting. Read
-the ordering with that in mind.
+runner, same scorer — so the CrewAI and LangChain rows differ by scaffold **and** by that one
+model setting. Read their ordering with that in mind.
 
 **The board ranks on Pass^N — a task counts only if the system solves it on every run.** Three
 things follow that are easy to miss:
@@ -46,14 +56,14 @@ things follow that are easy to miss:
 - **Two denominators, on purpose.** Pass^N and Pass@N are over the **149** tasks each system
   attempted, because reliability is only meaningful about work a system took on. EX is over all
   **190**, where an unattempted task counts as a failure — so declining the hard questions still
-  costs you. Both systems attempted the same 149 single-turn tasks.
-- **Ranking on the average would reward unreliability.** LangChain solves 117 of 149 tasks at least
-  once but only 86 of them every time: **31 tasks (21%) change verdict between identical runs**.
+  costs you. Every system attempted the same 149 single-turn tasks.
+- **Ranking on the average would reward unreliability.** LangChain solves 118 of 149 tasks at least
+  once but only 87 of them every time: **31 tasks (21%) change verdict between identical runs**.
   The crew churns less — 18 tasks (12%) — which is most of why it leads on Pass^N while trailing on
   Pass@N. That gap is churn, and a leaderboard reporting one number per system is publishing it as
   signal.
 - **Snapshots never mix in a ranking.** Neo-Cortex was measured against the v1.1 snapshot, so its
-  figures are real but not comparable with the ranked row, and it takes no rank. Gold answers are
+  figures are real but not comparable with the ranked rows, and it takes no rank. Gold answers are
   bound to the snapshot they were compiled against, and its captured SQL cannot be replayed onto a
   newer one, so a comparable number needs the agent re-run.
 

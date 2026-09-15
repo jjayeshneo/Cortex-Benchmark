@@ -28,26 +28,26 @@
     "attempted": 149,
     "evidence_provided": true,
     "verified_by_organizers": true,
-    "evaluated_at": "2026-09-01T17:53:22Z"
+    "evaluated_at": "2026-09-15T16:21:18Z"
   },
   "results": {
     "execution_accuracy": {
-      "mean": 0.533333,
-      "n": 101,
+      "mean": 0.538597,
+      "n": 102,
       "std": 0.016079,
       "runs": [
-        0.536842,
-        0.515789,
-        0.547368
+        0.542105,
+        0.521053,
+        0.552632
       ]
     },
     "session_accuracy": {
-      "mean": 0.645435,
+      "mean": 0.651805,
       "std": 0.019459,
       "runs": [
-        0.649682,
-        0.624204,
-        0.66242
+        0.656051,
+        0.630573,
+        0.66879
       ]
     },
     "multi_turn_session_accuracy": {
@@ -68,12 +68,12 @@
       ]
     },
     "pass_any": {
-      "mean": 0.785235,
-      "n": 117
+      "mean": 0.791946,
+      "n": 118
     },
     "pass_all": {
-      "mean": 0.577181,
-      "n": 86
+      "mean": 0.583893,
+      "n": 87
     },
     "cost_usd_per_task": {
       "mean": 0.004862,
@@ -91,7 +91,7 @@
       "1": 0.7143,
       "2": 0.7333,
       "3": 0.7429,
-      "4": 0.7143,
+      "4": 0.7429,
       "5": 0.5333,
       "6": 0.2,
       "7": 0.1
@@ -102,6 +102,6 @@
     "test_data_seen": false,
     "human_in_loop": false,
     "artifacts": "runs/v13_replay/ (organizer-side; per-task SQL, verdict, latency and cost for all three runs)",
-    "notes": "Single-turn only: the 41 tier-9 multi-turn turns were not attempted and are scored as failures, which is why execution accuracy over the 190-task denominator is far below the single-turn subset figure of 68.0%. SQL was captured during the live runs and re-executed verbatim against the scored snapshot; latency and cost are from the live runs, verdicts from the re-execution. Re-scoring these same captures from v1.2 to v1.3 changed 0 of 600 task-run verdicts."
+    "notes": "Single-turn only: the 41 tier-9 multi-turn turns were not attempted and are scored as failures, which is why execution accuracy over the 190-task denominator is far below the single-turn subset figure of 68.0%. SQL was captured during the live runs and re-executed verbatim against the scored snapshot; latency and cost are from the live runs, verdicts from the re-execution. Re-scoring these same captures from v1.2 to v1.3 changed 0 of 600 task-run verdicts. CORRECTED 2026-09-15 (see ERRATA E-2026-09-15-12): this row was originally published as 86/149 because it was scored while `CB_T4_069_T1` still carried the pre-F6 gold of 94 rows, whereas CrewAI, nao, Vanna and Claude Code were all scored against the corrected gold of 72. All three published LangChain captures return 72 rows on that task and pass against the corrected gold. Re-scoring the same three submissions changes exactly one task and nothing else: pass_all 86 -> 87, pass_any 117 -> 118, each run +1, tier 4 0.7143 -> 0.7429. The board is now on a single gold basis."
   }
 }
