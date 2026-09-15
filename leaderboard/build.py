@@ -616,8 +616,7 @@ def build(entries: list) -> str:
        band, not across the column. The gpt-5.6-luna rows are billed per token and measured per
        task. Claude Code's is API-equivalent rather than billed &mdash; nothing was charged.
        Snowflake Cortex Analyst reports no per-request cost at all, so its figure is derived from
-       account-level credit metering across a whole day and assumes an edition rate; a different
-       edition moves it by a third in either direction. Each row's <code>notes</code> field in
+       account-level credit metering across a whole day at the account's credit rate. Each row's <code>notes</code> field in
        <code>results/</code> states exactly how its number was obtained. Read them before
        quoting a ratio between two rows.</p>
   </div>
