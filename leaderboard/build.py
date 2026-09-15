@@ -615,8 +615,9 @@ def build(entries: list) -> str:
     <p class="note"><strong>Cost is not one meter.</strong> These figures are comparable within a
        band, not across the column. The gpt-5.6-luna rows are billed per token and measured per
        task. Claude Code's is API-equivalent rather than billed &mdash; nothing was charged.
-       Snowflake Cortex Analyst reports no per-request cost at all, so its figure is derived from
-       account-level credit metering across a whole day at the account's credit rate. Each row's <code>notes</code> field in
+       Snowflake Cortex Analyst reports no per-request cost at all and is billed per message at a
+       flat rate rather than per token, so its figure is derived from account-level credit
+       metering and is insensitive to how much context each call carried. Each row's <code>notes</code> field in
        <code>results/</code> states exactly how its number was obtained. Read them before
        quoting a ratio between two rows.</p>
   </div>
