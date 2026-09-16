@@ -27,15 +27,27 @@ that they do not is depth in one domain, conversations, and questions designed t
 Live board: **[jjayeshneo.github.io/Cortex-Benchmark](https://jjayeshneo.github.io/Cortex-Benchmark/)** —
 generated from `results/*.json`, one committed file per row.
 
-| | System | Model | Pass^N | Pass@N | EX (mean ± sd) | Runs | Snapshot |
-|---|---|---|---|---|---|---|---|
-| 1 ‡ | Claude Code | Claude Sonnet ‡ | **79.2%** | 91.9% | 67.0% ± 0.8 | 3 | v1.3 |
-| 2 ‡ | Snowflake Cortex Analyst | managed, undisclosed ‡ | **71.1%** | 78.5% | 59.1% ± 0.8 | 3 | v1.3 |
-| 1 | Vanna | gpt-5.6-luna | **65.1%** | 77.9% | 57.0% ± 1.1 | 3 | v1.3 |
-| 2 | CrewAI | gpt-5.6-luna † | **61.1%** | 73.1% | 53.2% ± 1.1 | 3 | v1.3 |
-| 3 | LangChain SQL agent | gpt-5.6-luna | **58.4%** | 79.2% | 53.9% ± 1.6 | 3 | v1.3 |
-| 4 | nao | gpt-5.6-luna | **55.7%** | 72.5% | 50.9% ± 1.2 | 3 | v1.3 |
-| — | *Neo-Cortex* | *gpt-5.6-luna* | *57.0%* | *71.1%* | *50.3% ± 2.6* | 2 | **v1.1** |
+| | System | Model | Pass^N | Pass@N | EX (mean ± sd) | SSR | Runs | Snapshot |
+|---|---|---|---|---|---|---|---|---|
+| 1 ‡ | Claude Code | Claude Sonnet ‡ | **70.5%** | 84.7% | 77.4% ± 1.6 | 0/8 | 3 | v1.3 |
+| 2 ‡ | Snowflake Cortex Analyst | managed, undisclosed ‡ | **65.8%** | 74.2% | 70.5% ± 0.9 | 0/8 | 3 | v1.3 |
+| 1 | Vanna | gpt-5.6-luna | **58.4%** | 72.6% | 66.7% ± 0.8 | 0/8 | 3 | v1.3 |
+| 2 | CrewAI | gpt-5.6-luna † | **55.8%** | 71.1% | 63.3% ± 2.1 | 0/8 | 3 | v1.3 |
+| 3 | LangChain SQL agent | gpt-5.6-luna | **54.2%** | 75.8% | 64.9% ± 1.7 | **1/8** | 3 | v1.3 |
+| 4 | nao | gpt-5.6-luna | **46.3%** | 63.2% | 55.8% ± 3.2 | 0/8 | 3 | v1.3 |
+| — | *Neo-Cortex* | *gpt-5.6-luna* | *57.0%* | *71.1%* | *50.3% ± 2.6* | — | 2 | **v1.1** |
+
+**All 190 tasks, all attempted.** Pass^N and Pass@N are over **190** — 149 single-turn tasks plus
+41 multi-turn turns. Earlier versions of this board used a 149 denominator because no system
+attempted the multi-turn half; every ranked row now does, so the old denominator no longer
+applies and percentages before 2026-09-17 are not comparable with these (see `ERRATA.md`,
+E-2026-09-17-13). Neo-Cortex is the exception: it predates the change, is on the v1.1 snapshot,
+and takes no rank.
+
+**SSR is session success rate** — the fraction of the 8 multi-turn conversations a system
+completed *entirely*, on every run. One session has ever been completed, by one system. The
+per-session turn counts are on the live board under **Multi-turn**, and they matter: a system
+that solves 6 of 8 turns and one that solves 0 of 8 both score a failed session.
 
 ‡ **Two bands, ranked separately.** Rows 1–4 are the *controlled* arm: different scaffolds over
 one fixed base model, so the ordering is a scaffold comparison. The ‡ rows are the *commercial*
@@ -57,9 +69,9 @@ things follow that are easy to miss:
   attempted, because reliability is only meaningful about work a system took on. EX is over all
   **190**, where an unattempted task counts as a failure — so declining the hard questions still
   costs you. Every system attempted the same 149 single-turn tasks.
-- **Ranking on the average would reward unreliability.** LangChain solves 118 of 149 tasks at least
-  once but only 87 of them every time: **31 tasks (21%) change verdict between identical runs**.
-  The crew churns less — 18 tasks (12%) — which is most of why it leads on Pass^N while trailing on
+- **Ranking on the average would reward unreliability.** LangChain solves 144 of 190 tasks at least
+  once but only 103 of them every time: **41 tasks (22%) change verdict between identical runs**.
+  The crew churns less — 29 tasks (15%) — which is most of why it leads on Pass^N while trailing on
   Pass@N. That gap is churn, and a leaderboard reporting one number per system is publishing it as
   signal.
 - **Snapshots never mix in a ranking.** Neo-Cortex was measured against the v1.1 snapshot, so its

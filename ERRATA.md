@@ -43,6 +43,45 @@ are listed so that a later decision is visible as a change rather than a surpris
 
 ## Fixed
 
+### E-2026-09-17-13 — Multi-turn is now measured, and the denominator changed with it
+**Severity: high. Affects: every ranked row, and every percentage published before this date.**
+
+Until now no system attempted the 41 tier-9 multi-turn turns. They counted as failures in
+execution accuracy over 190, while Pass^N and Pass@N used a 149 denominator on the stated
+grounds that reliability is only meaningful about work a system took on.
+
+All six ranked systems have now run them, under a **chained** protocol: each turn is handed the
+agent's own SQL from the immediately preceding turn of that session — right or wrong, never
+corrected. An error on turn 2 is inherited by turn 3. Nothing gold is supplied at any point.
+
+Two consequences, both of which change published numbers.
+
+**Pass^N and Pass@N are now over 190, not 149.** Every system attempts every task, so the old
+denominator no longer describes anything. Percentages fall accordingly — Claude Code's Pass^N
+reads 70.5% here against 79.2% before, on more tasks, not fewer. A figure from before
+2026-09-17 and one from after are not comparable as rates. The counts behind them are, and are
+published alongside.
+
+**Session success rate is reported for the first time.** A session counts only if every turn in
+it passes on every run. Across 8 sessions and 6 systems, exactly one session has ever been
+completed: LangChain took one four-turn session 4/4 on all three runs. Everything else
+is 0/8. The session is identified by label on the board, not by task id, because these tasks
+are held out.
+
+An earlier plan measured these turns with an authored gold prior supplied at every turn. Those
+runs were completed for all six systems and are **not** published: a turn handed a correct prior
+regardless of what the agent did measures a per-turn ceiling, not whether a system can hold a
+conversation. They are retained as ablation data. One finding from them is worth recording,
+because it is counterintuitive: for LangChain the gold prior scored *worse* than the agent's own
+prior (13/41 against 16/41). The authored prior is a deliberately minimal join key, while the
+agent's own previous query is a complete statement — apparently more useful to build on, even
+when wrong.
+
+**Also added:** `results.by_session` in the entry schema, recording turns passed per session.
+SSR alone cannot distinguish a system that solved 6 of 8 turns from one that solved 0 of 8;
+both are a failed session, and they are not the same result.
+
+
 ### E-2026-09-15-12 — The LangChain row was scored against a different gold than every other row
 **Severity: high. Affects: `results/2026-09-01-langchain-sql-agent.json`, and the README table.**
 

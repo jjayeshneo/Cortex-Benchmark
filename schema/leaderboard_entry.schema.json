@@ -239,6 +239,32 @@
             "minimum": 0,
             "maximum": 1
           }
+        },
+        "by_session": {
+          "type": "object",
+          "description": "session_id -> how that multi-turn session went under the CHAINED protocol. turns_passed counts turns solved on EVERY run, matching the headline metric. session_passed is true only when every turn in the session passed on every run, which is what session success rate counts. Recorded per session because a 6-of-8 near miss and a 0-of-8 collapse are both 'fail' otherwise.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "turns_passed",
+              "turns_total",
+              "session_passed"
+            ],
+            "properties": {
+              "turns_passed": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "turns_total": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "session_passed": {
+                "type": "boolean"
+              }
+            }
+          }
         }
       }
     },

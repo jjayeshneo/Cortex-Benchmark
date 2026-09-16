@@ -167,6 +167,7 @@ function toggleTheme(){
     <nav class="nav">
       <a href="#leaderboard">Leaderboard</a>
       <a href="#breakdown">By tier</a>
+      <a href="#multiturn">Multi-turn</a>
       <a href="#efficiency">Cost &amp; latency</a>
       <a href="#method">Method</a>
       <a href="https://github.com/jjayeshneo/Cortex-Benchmark">Repository</a>
@@ -201,7 +202,7 @@ function toggleTheme(){
        &ldquo;when it answers, can you rely on it?&rdquo;. Underneath each sits <strong>EX</strong>,
        execution accuracy over the full 190-task set, where anything unattempted counts as a
        failure &mdash; so skipping still costs you there. Every system on this board attempted the
-       same 149 single-turn tasks, which makes the reliability figures directly comparable.</p>
+       same 190 single-turn tasks, which makes the reliability figures directly comparable.</p>
 
     <div class="controls">
       <div class="legend"><span class="k"><span class="dot" style="background:var(--measured)"></span>Measured &mdash; ranked, current snapshot</span><span class="k"><span class="dot" style="background:var(--legacy)"></span>Legacy &mdash; older snapshot, unranked</span></div>
@@ -231,23 +232,23 @@ function toggleTheme(){
               <div>
                 <div class="agent-name">Claude Code</div>
                 <div class="agent-arch">sonnet &middot; claude-code 2.1.263, headless `claude -p` with a single read-only run_sql MCP tool</div>
-                <div class="agent-arch"><span class="warn" title="Did not attempt 41 of 190 tasks; they are scored as failures.">149/190 attempted</span> &middot; 3 runs</div>
+                <div class="agent-arch">190/190 attempted &middot; 3 runs</div>
               </div>
             </div>
           </td>
           <td><span class="band-pill measured">Measured</span></td>
-          <td class="num" title="runs: 66.3%, 67.9%, 66.8%">
+          <td class="num" title="runs: 75.8%, 78.9%, 77.4%">
             <div class="score-cell">
               <span class="bar"><span class="lead" style="width:100.0%"></span></span>
-              <span class="score-num lead">79.2%</span>
+              <span class="score-num lead">70.5%</span>
             </div>
-            <div class="score-sub">EX 67.0%<span class="pm"> &plusmn;0.8</span></div>
+            <div class="score-sub">EX 77.4%<span class="pm"> &plusmn;1.6</span></div>
           </td>
-          <td class="num sub-num">91.9%</td>
+          <td class="num sub-num">84.7%</td>
           <td class="num sub-num">14.4s</td>
           <td class="num sub-num">204,532</td>
           <td class="num sub-num">$0.0953</td>
-          <td class="num sub-num">$0.1203</td>
+          <td class="num sub-num">$0.1351</td>
         </tr>
         <tr class="measured">
           <td class="rank">2</td>
@@ -257,23 +258,23 @@ function toggleTheme(){
               <div>
                 <div class="agent-name">Snowflake Cortex Analyst</div>
                 <div class="agent-arch">Snowflake Cortex Analyst (managed, not disclosed) &middot; Cortex Analyst REST API, inline semantic model (22 base tables, quoted identifiers)</div>
-                <div class="agent-arch"><span class="warn" title="Did not attempt 41 of 190 tasks; they are scored as failures.">149/190 attempted</span> &middot; 3 runs</div>
+                <div class="agent-arch">190/190 attempted &middot; 3 runs</div>
               </div>
             </div>
           </td>
           <td><span class="band-pill measured">Measured</span></td>
-          <td class="num" title="runs: 58.4%, 60.0%, 58.9%">
+          <td class="num" title="runs: 70.0%, 71.6%, 70.0%">
             <div class="score-cell">
-              <span class="bar"><span class="" style="width:89.8%"></span></span>
-              <span class="score-num">71.1%</span>
+              <span class="bar"><span class="" style="width:93.3%"></span></span>
+              <span class="score-num">65.8%</span>
             </div>
-            <div class="score-sub">EX 59.1%<span class="pm"> &plusmn;0.8</span></div>
+            <div class="score-sub">EX 70.5%<span class="pm"> &plusmn;0.9</span></div>
           </td>
-          <td class="num sub-num">78.5%</td>
+          <td class="num sub-num">74.2%</td>
           <td class="num sub-num">7.8s</td>
           <td class="num sub-num"><span class="na" title="not measured">&mdash;</span></td>
           <td class="num sub-num">$0.1629</td>
-          <td class="num sub-num">$0.2290</td>
+          <td class="num sub-num">$0.2476</td>
         </tr>
         <tr class="measured">
           <td class="rank">3</td>
@@ -283,23 +284,23 @@ function toggleTheme(){
               <div>
                 <div class="agent-name">Vanna</div>
                 <div class="agent-arch">gpt-5.6-luna &middot; vanna 2.0.2, Agent loop with ToolRegistry(run_sql)</div>
-                <div class="agent-arch"><span class="warn" title="Did not attempt 41 of 190 tasks; they are scored as failures.">149/190 attempted</span> &middot; 3 runs</div>
+                <div class="agent-arch">190/190 attempted &middot; 3 runs</div>
               </div>
             </div>
           </td>
           <td><span class="band-pill measured">Measured</span></td>
-          <td class="num" title="runs: 57.9%, 55.8%, 57.4%">
+          <td class="num" title="runs: 66.8%, 65.8%, 67.4%">
             <div class="score-cell">
-              <span class="bar"><span class="" style="width:82.2%"></span></span>
-              <span class="score-num">65.1%</span>
+              <span class="bar"><span class="" style="width:82.8%"></span></span>
+              <span class="score-num">58.4%</span>
             </div>
-            <div class="score-sub">EX 57.0%<span class="pm"> &plusmn;1.1</span></div>
+            <div class="score-sub">EX 66.7%<span class="pm"> &plusmn;0.8</span></div>
           </td>
-          <td class="num sub-num">77.9%</td>
+          <td class="num sub-num">72.6%</td>
           <td class="num sub-num">6.2s</td>
           <td class="num sub-num">7,938</td>
           <td class="num sub-num">$0.0019</td>
-          <td class="num sub-num">$0.0030</td>
+          <td class="num sub-num">$0.0033</td>
         </tr>
         <tr class="measured">
           <td class="rank">4</td>
@@ -309,23 +310,23 @@ function toggleTheme(){
               <div>
                 <div class="agent-name">CrewAI</div>
                 <div class="agent-arch">gpt-5.6-luna &middot; crewai 1.15.2, sequential crew (SQL Analyst + Query Validator)</div>
-                <div class="agent-arch"><span class="warn" title="Did not attempt 41 of 190 tasks; they are scored as failures.">149/190 attempted</span> &middot; 3 runs</div>
+                <div class="agent-arch">190/190 attempted &middot; 3 runs</div>
               </div>
             </div>
           </td>
           <td><span class="band-pill measured">Measured</span></td>
-          <td class="num" title="runs: 53.2%, 54.2%, 52.1%">
+          <td class="num" title="runs: 65.3%, 63.7%, 61.1%">
             <div class="score-cell">
-              <span class="bar"><span class="" style="width:77.1%"></span></span>
-              <span class="score-num">61.1%</span>
+              <span class="bar"><span class="" style="width:79.1%"></span></span>
+              <span class="score-num">55.8%</span>
             </div>
-            <div class="score-sub">EX 53.2%<span class="pm"> &plusmn;1.1</span></div>
+            <div class="score-sub">EX 63.3%<span class="pm"> &plusmn;2.1</span></div>
           </td>
-          <td class="num sub-num">73.2%</td>
+          <td class="num sub-num">71.1%</td>
           <td class="num sub-num">8.0s</td>
           <td class="num sub-num">15,173</td>
           <td class="num sub-num">$0.0042</td>
-          <td class="num sub-num">$0.0069</td>
+          <td class="num sub-num">$0.0076</td>
         </tr>
         <tr class="measured">
           <td class="rank">5</td>
@@ -335,23 +336,23 @@ function toggleTheme(){
               <div>
                 <div class="agent-name">LangChain SQL agent</div>
                 <div class="agent-arch">gpt-5.6-luna &middot; langchain create_sql_agent, default toolkit</div>
-                <div class="agent-arch"><span class="warn" title="Did not attempt 41 of 190 tasks; they are scored as failures.">149/190 attempted</span> &middot; 3 runs</div>
+                <div class="agent-arch">190/190 attempted &middot; 3 runs</div>
               </div>
             </div>
           </td>
           <td><span class="band-pill measured">Measured</span></td>
-          <td class="num" title="runs: 54.2%, 52.1%, 55.3%">
+          <td class="num" title="runs: 64.2%, 63.7%, 66.8%">
             <div class="score-cell">
-              <span class="bar"><span class="" style="width:73.7%"></span></span>
-              <span class="score-num">58.4%</span>
+              <span class="bar"><span class="" style="width:76.9%"></span></span>
+              <span class="score-num">54.2%</span>
             </div>
-            <div class="score-sub">EX 53.9%<span class="pm"> &plusmn;1.6</span></div>
+            <div class="score-sub">EX 64.9%<span class="pm"> &plusmn;1.7</span></div>
           </td>
-          <td class="num sub-num">79.2%</td>
+          <td class="num sub-num">75.8%</td>
           <td class="num sub-num">20.7s</td>
           <td class="num sub-num"><span class="na" title="not measured">&mdash;</span></td>
           <td class="num sub-num">$0.0049</td>
-          <td class="num sub-num">$0.0083</td>
+          <td class="num sub-num">$0.0090</td>
         </tr>
         <tr class="measured">
           <td class="rank">6</td>
@@ -361,23 +362,23 @@ function toggleTheme(){
               <div>
                 <div class="agent-name">nao</div>
                 <div class="agent-arch">gpt-5.6-luna &middot; nao agent with dataset context layer, /api/agent SSE</div>
-                <div class="agent-arch"><span class="warn" title="Did not attempt 41 of 190 tasks; they are scored as failures.">149/190 attempted</span> &middot; 3 runs</div>
+                <div class="agent-arch">190/190 attempted &middot; 3 runs</div>
               </div>
             </div>
           </td>
           <td><span class="band-pill measured">Measured</span></td>
-          <td class="num" title="runs: 51.6%, 51.6%, 49.5%">
+          <td class="num" title="runs: 57.4%, 57.9%, 52.1%">
             <div class="score-cell">
-              <span class="bar"><span class="" style="width:70.3%"></span></span>
-              <span class="score-num">55.7%</span>
+              <span class="bar"><span class="" style="width:65.7%"></span></span>
+              <span class="score-num">46.3%</span>
             </div>
-            <div class="score-sub">EX 50.9%<span class="pm"> &plusmn;1.2</span></div>
+            <div class="score-sub">EX 55.8%<span class="pm"> &plusmn;3.2</span></div>
           </td>
-          <td class="num sub-num">72.5%</td>
+          <td class="num sub-num">63.2%</td>
           <td class="num sub-num">12.4s</td>
           <td class="num sub-num"><span class="na" title="not measured">&mdash;</span></td>
           <td class="num sub-num">$0.0081</td>
-          <td class="num sub-num">$0.0146</td>
+          <td class="num sub-num">$0.0175</td>
         </tr>
         <tr class="legacy">
           <td class="rank">&mdash;</td>
@@ -394,7 +395,7 @@ function toggleTheme(){
           <td><span class="band-pill legacy">Legacy &middot; v1.1</span></td>
           <td class="num" title="runs: 48.4%, 52.1%">
             <div class="score-cell">
-              <span class="bar"><span class="" style="width:72.0%"></span></span>
+              <span class="bar"><span class="" style="width:80.9%"></span></span>
               <span class="score-num">57.0%</span>
             </div>
             <div class="score-sub">EX 50.3%<span class="pm"> &plusmn;2.6</span></div>
@@ -416,7 +417,7 @@ function toggleTheme(){
       <b>Pass@N</b> and <b>Pass^N</b> is churn, and it is large for every system measured so far.
       Every individual run's score is published in the entry file, including the bad ones.</p>
       <p class="note"><strong>Two denominators, on purpose.</strong> Pass^N and Pass@N are over the
-      149 tasks attempted, because reliability is only meaningful about work a system took on. EX
+      190 tasks attempted, because reliability is only meaningful about work a system took on. EX
       is over all 190, because a system must not be able to raise its headline by declining the
       hard questions. Both are shown so neither can be quoted alone.</p>
       <p class="note"><strong>Neo-Cortex</strong> carries a <b>Legacy</b> pill because it was measured against an earlier data snapshot. Gold answers are bound to the snapshot they were compiled from, so that figure is real but not comparable with the ranked rows, and it takes no rank. Its captured SQL cannot be re-executed either &mdash; the agent emitted parameterised SQL whose bound values were never recorded &mdash; so a comparable number needs the agent re-run, not the capture re-scored.</p>
@@ -435,34 +436,67 @@ function toggleTheme(){
        stronger.</p>
     <div class="grid-scroll">
       <table class="breakdown">
-        <thead><tr><th>System</th><th class="num" title="Schema linking">T1</th><th class="num" title="Single-table filter">T2</th><th class="num" title="Joins">T3</th><th class="num" title="Aggregation">T4</th><th class="num" title="Window / ranking">T5</th><th class="num" title="Domain computation">T6</th><th class="num" title="Unanswerable / null-result">T7</th></tr></thead>
+        <thead><tr><th>System</th><th class="num" title="Schema linking">T1</th><th class="num" title="Single-table filter">T2</th><th class="num" title="Joins">T3</th><th class="num" title="Aggregation">T4</th><th class="num" title="Window / ranking">T5</th><th class="num" title="Domain computation">T6</th><th class="num" title="Unanswerable / null-result">T7</th><th class="num" title="Multi-turn session">T9</th></tr></thead>
         <tbody>
-        <tr><td>Claude Code</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 38%, transparent)">93</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 38%, transparent)">93</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 36%, transparent)">89</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 34%, transparent)">83</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 20%, transparent)">40</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">100</span></td></tr>
-        <tr><td>Snowflake Cortex Analyst</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">86</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 34%, transparent)">83</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 32%, transparent)">77</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">24</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">100</span></td></tr>
-        <tr><td>Vanna</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 33%, transparent)">79</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">87</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 27%, transparent)">63</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">67</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">24</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">100</span></td></tr>
-        <tr><td>CrewAI</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">87</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 27%, transparent)">63</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 27%, transparent)">63</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">67</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 13%, transparent)">20</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 37%, transparent)">90</span></td></tr>
-        <tr><td>LangChain SQL agent</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">74</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">74</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 24%, transparent)">53</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 13%, transparent)">20</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">10</span></td></tr>
-        <tr><td>nao</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 33%, transparent)">79</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 33%, transparent)">80</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 26%, transparent)">60</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 26%, transparent)">60</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 20%, transparent)">40</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">100</span></td></tr>
-        <tr><td>Neo-Cortex</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">86</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">67</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">69</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 28%, transparent)">66</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 17%, transparent)">33</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 37%, transparent)">90</span></td></tr>
+        <tr><td>Claude Code</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 38%, transparent)">93</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 38%, transparent)">93</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 36%, transparent)">89</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 34%, transparent)">83</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 20%, transparent)">40</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">100</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 19%, transparent)">39</span></td></tr>
+        <tr><td>Snowflake Cortex Analyst</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">86</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 34%, transparent)">83</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 32%, transparent)">77</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">24</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">100</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 22%, transparent)">46</span></td></tr>
+        <tr><td>Vanna</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 33%, transparent)">79</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">87</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 27%, transparent)">63</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">67</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">24</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">100</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 18%, transparent)">34</span></td></tr>
+        <tr><td>CrewAI</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">87</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 27%, transparent)">63</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 27%, transparent)">63</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">67</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 13%, transparent)">20</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 37%, transparent)">90</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 18%, transparent)">37</span></td></tr>
+        <tr><td>LangChain SQL agent</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 30%, transparent)">71</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">74</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">74</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 24%, transparent)">53</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 13%, transparent)">20</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">10</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 19%, transparent)">39</span></td></tr>
+        <tr><td>nao</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 33%, transparent)">79</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 33%, transparent)">80</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 26%, transparent)">60</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 26%, transparent)">60</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 20%, transparent)">40</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">100</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 10%, transparent)">12</span></td></tr>
+        <tr><td>Neo-Cortex</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">86</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">67</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">69</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 28%, transparent)">66</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 17%, transparent)">33</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 37%, transparent)">90</span></td><td class="num na">&mdash;</td></tr>
         </tbody>
       </table>
-      <p class="note"><b>T1</b> Schema linking &middot; <b>T2</b> Single-table filter &middot; <b>T3</b> Joins &middot; <b>T4</b> Aggregation &middot; <b>T5</b> Window / ranking &middot; <b>T6</b> Domain computation &middot; <b>T7</b> Unanswerable / null-result. Values are Pass^N: % of the tier solved on every run.</p>
+      <p class="note"><b>T1</b> Schema linking &middot; <b>T2</b> Single-table filter &middot; <b>T3</b> Joins &middot; <b>T4</b> Aggregation &middot; <b>T5</b> Window / ranking &middot; <b>T6</b> Domain computation &middot; <b>T7</b> Unanswerable / null-result &middot; <b>T9</b> Multi-turn session. Values are Pass^N: % of the tier solved on every run.</p>
     </div>
     <p class="note">Tier 8 is excluded from every figure on this page: those ten tasks are graded
        against a rubric and the judge is not implemented, so they are neither passes nor failures.</p>
   </div>
 </section>
 
+<section id="multiturn">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Multi-turn: sessions, not turns</h2></div>
+    <p class="sec-desc">The 41 tier-9 turns belong to 8 conversations. Each turn is handed the
+       agent&rsquo;s <strong>own</strong> SQL from the previous turn &mdash; right or wrong, never
+       corrected, never gold. An error on turn 2 is inherited by turn 3, which is the point: this
+       measures whether a system can hold a conversation, not whether it can answer a question.
+       <strong>Session success rate counts a session only when every turn in it passes on every
+       run.</strong></p>
+    <div class="grid-scroll">
+      <table class="breakdown">
+        <thead><tr><th>System</th><th class="num" title="9 turns">S1</th><th class="num" title="8 turns">S2</th><th class="num" title="4 turns">S3</th><th class="num" title="4 turns">S4</th><th class="num" title="4 turns">S5</th><th class="num" title="4 turns">S6</th><th class="num" title="4 turns">S7</th><th class="num" title="4 turns">S8</th><th class="num">SSR</th></tr></thead>
+        <tbody>
+        <tr><td>Claude Code</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 17%, transparent)">3/9</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 23%, transparent)">4/8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 23%, transparent)">2/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 32%, transparent)">3/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 23%, transparent)">2/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">1/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">1/4</span></td><td class="num"><b>0/8</b></td></tr>
+        <tr><td>Snowflake Cortex Analyst</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">2/9</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 32%, transparent)">6/8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">1/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 32%, transparent)">3/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 23%, transparent)">2/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 32%, transparent)">3/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 23%, transparent)">2/4</span></td><td class="num"><b>0/8</b></td></tr>
+        <tr><td>Vanna</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 21%, transparent)">4/9</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 23%, transparent)">4/8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">1/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">1/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 23%, transparent)">2/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 23%, transparent)">2/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><b>0/8</b></td></tr>
+        <tr><td>CrewAI</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 25%, transparent)">5/9</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 27%, transparent)">5/8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 23%, transparent)">2/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 23%, transparent)">2/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">1/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><b>0/8</b></td></tr>
+        <tr><td>LangChain SQL agent</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">2/9</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 32%, transparent)">6/8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">1/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">4/4 ✓</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 23%, transparent)">2/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">1/4</span></td><td class="num"><b>1/8</b></td></tr>
+        <tr><td>nao</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 17%, transparent)">3/9</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">1/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">1/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 6%, transparent)">0/4</span></td><td class="num"><b>0/8</b></td></tr>
+        </tbody>
+      </table>
+      <p class="note">Cells are turns solved on every run, out of the turns in that session.
+         &#10003; marks a session where every turn passed &mdash; the only thing that counts
+         toward SSR. Sessions are labelled rather than named: six run to 4 turns, one to 8 and
+         one to 9. The tasks themselves are held out, so they are described and not identified.</p>
+    </div>
+    <p class="note">SSR is deliberately harsh, and the per-session cells are why it is shown
+       alongside them rather than alone: a system that solves 6 of 8 turns and one that solves 0
+       of 8 both score a failed session, and those are not the same system. Read the cells for
+       capability and the SSR column for reliability.</p>
+  </div>
+</section>
+
 <section id="efficiency">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">03</span><h2>Cost and latency against accuracy</h2></div>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Cost and latency against accuracy</h2></div>
     <p class="sec-desc">What each system spends to get where it got. Accuracy runs along the
        horizontal axis (Pass^N), so <strong>bottom-right is best</strong>: reliable and cheap,
        reliable and fast. Correctness alone is not the whole picture on a 58-million-row database &mdash; a query
        that returns the right answer in six minutes is not a usable one.</p>
     <div class="scatter-grid">
-<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="USD per task against Pass^N"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0.0000</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">0.0509</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">0.1018</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">0.1527</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">0.2036</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">24%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">48%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">71%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">95%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Pass^N</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">USD per task</text><circle class="pt measured" cx="566.5" cy="85.6" r="6.5"/><text class="pt-label" x="555.5" y="83.6" text-anchor="end">Snowflake Cortex Analyst</text><text class="pt-sub" x="555.5" y="96.6" text-anchor="end">71.1% &middot; 0.1629</text><circle class="pt measured" cx="623.7" cy="194.5" r="6.5"/><text class="pt-label" x="612.7" y="192.5" text-anchor="end">Claude Code</text><text class="pt-sub" x="612.7" y="205.5" text-anchor="end">79.2% &middot; 0.0953</text><circle class="pt measured" cx="457.1" cy="334.9" r="6.5"/><text class="pt-label" x="468.1" y="332.9" text-anchor="start">nao</text><text class="pt-sub" x="468.1" y="345.9" text-anchor="start">55.7% &middot; 0.0081</text><circle class="pt measured" cx="476.1" cy="340.2" r="6.5"/><text class="pt-label" x="487.1" y="338.2" text-anchor="start">LangChain SQL agent</text><text class="pt-sub" x="487.1" y="351.2" text-anchor="start">58.4% &middot; 0.0049</text><circle class="pt measured" cx="495.1" cy="341.2" r="6.5"/><text class="pt-label" x="506.1" y="339.2" text-anchor="start">CrewAI</text><text class="pt-sub" x="506.1" y="352.2" text-anchor="start">61.1% &middot; 0.0042</text><circle class="pt measured" cx="523.7" cy="344.9" r="6.5"/><text class="pt-label" x="534.7" y="342.9" text-anchor="start">Vanna</text><text class="pt-sub" x="534.7" y="355.9" text-anchor="start">65.1% &middot; 0.0019</text></svg></div>
-<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="Median seconds against Pass^N"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">6</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">13</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">19</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">26</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">24%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">48%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">71%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">95%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Pass^N</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">Median seconds</text><circle class="pt measured" cx="476.1" cy="85.6" r="6.5"/><text class="pt-label" x="487.1" y="83.6" text-anchor="start">LangChain SQL agent</text><text class="pt-sub" x="487.1" y="96.6" text-anchor="start">58.4% &middot; 21</text><circle class="pt measured" cx="623.7" cy="165.5" r="6.5"/><text class="pt-label" x="612.7" y="163.5" text-anchor="end">Claude Code</text><text class="pt-sub" x="612.7" y="176.5" text-anchor="end">79.2% &middot; 14</text><circle class="pt measured" cx="457.1" cy="190.9" r="6.5"/><text class="pt-label" x="468.1" y="188.9" text-anchor="start">nao</text><text class="pt-sub" x="468.1" y="201.9" text-anchor="start">55.7% &middot; 12</text><circle class="pt measured" cx="495.1" cy="246.6" r="6.5"/><text class="pt-label" x="506.1" y="244.6" text-anchor="start">CrewAI</text><text class="pt-sub" x="506.1" y="257.6" text-anchor="start">61.1% &middot; 8</text><circle class="pt measured" cx="566.5" cy="249.4" r="6.5"/><text class="pt-label" x="555.5" y="247.4" text-anchor="end">Snowflake Cortex Analyst</text><text class="pt-sub" x="555.5" y="260.4" text-anchor="end">71.1% &middot; 8</text><circle class="pt measured" cx="523.7" cy="269.4" r="6.5"/><text class="pt-label" x="534.7" y="267.4" text-anchor="start">Vanna</text><text class="pt-sub" x="534.7" y="280.4" text-anchor="start">65.1% &middot; 6</text></svg></div>
+<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="USD per task against Pass^N"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0.0000</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">0.0509</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">0.1018</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">0.1527</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">0.2036</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">21%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">42%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">63%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">85%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Pass^N</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">USD per task</text><circle class="pt measured" cx="585.9" cy="85.6" r="6.5"/><text class="pt-label" x="574.9" y="83.6" text-anchor="end">Snowflake Cortex Analyst</text><text class="pt-sub" x="574.9" y="96.6" text-anchor="end">65.8% &middot; 0.1629</text><circle class="pt measured" cx="623.7" cy="194.5" r="6.5"/><text class="pt-label" x="612.7" y="192.5" text-anchor="end">Claude Code</text><text class="pt-sub" x="612.7" y="205.5" text-anchor="end">70.5% &middot; 0.0953</text><circle class="pt measured" cx="430.9" cy="334.9" r="6.5"/><text class="pt-label" x="441.9" y="332.9" text-anchor="start">nao</text><text class="pt-sub" x="441.9" y="345.9" text-anchor="start">46.3% &middot; 0.0081</text><circle class="pt measured" cx="493.7" cy="340.2" r="6.5"/><text class="pt-label" x="504.7" y="338.2" text-anchor="start">LangChain SQL agent</text><text class="pt-sub" x="504.7" y="351.2" text-anchor="start">54.2% &middot; 0.0049</text><circle class="pt measured" cx="506.3" cy="341.2" r="6.5"/><text class="pt-label" x="517.3" y="339.2" text-anchor="start">CrewAI</text><text class="pt-sub" x="517.3" y="352.2" text-anchor="start">55.8% &middot; 0.0042</text><circle class="pt measured" cx="527.3" cy="344.9" r="6.5"/><text class="pt-label" x="538.3" y="342.9" text-anchor="start">Vanna</text><text class="pt-sub" x="538.3" y="355.9" text-anchor="start">58.4% &middot; 0.0019</text></svg></div>
+<div class="scatter-box"><svg viewBox="0 0 760 400" role="img" aria-label="Median seconds against Pass^N"><line class="axis-line" x1="62" y1="348" x2="736" y2="348"/><line class="axis-line" x1="62" y1="20" x2="62" y2="348"/><text class="axis-label" x="52" y="352.0" text-anchor="end">0</text><line class="grid-line" x1="62" y1="266.0" x2="736" y2="266.0"/><text class="axis-label" x="52" y="270.0" text-anchor="end">6</text><line class="grid-line" x1="62" y1="184.0" x2="736" y2="184.0"/><text class="axis-label" x="52" y="188.0" text-anchor="end">13</text><line class="grid-line" x1="62" y1="102.0" x2="736" y2="102.0"/><text class="axis-label" x="52" y="106.0" text-anchor="end">19</text><line class="grid-line" x1="62" y1="20.0" x2="736" y2="20.0"/><text class="axis-label" x="52" y="24.0" text-anchor="end">26</text><text class="axis-label" x="62.0" y="366" text-anchor="middle">0%</text><text class="axis-label" x="230.5" y="366" text-anchor="middle">21%</text><text class="axis-label" x="399.0" y="366" text-anchor="middle">42%</text><text class="axis-label" x="567.5" y="366" text-anchor="middle">63%</text><text class="axis-label" x="736.0" y="366" text-anchor="middle">85%</text><text class="axis-title" x="399" y="388" text-anchor="middle">Pass^N</text><text class="axis-title" x="-184" y="16" transform="rotate(-90)" text-anchor="middle">Median seconds</text><circle class="pt measured" cx="493.7" cy="85.6" r="6.5"/><text class="pt-label" x="504.7" y="83.6" text-anchor="start">LangChain SQL agent</text><text class="pt-sub" x="504.7" y="96.6" text-anchor="start">54.2% &middot; 21</text><circle class="pt measured" cx="623.7" cy="165.5" r="6.5"/><text class="pt-label" x="612.7" y="163.5" text-anchor="end">Claude Code</text><text class="pt-sub" x="612.7" y="176.5" text-anchor="end">70.5% &middot; 14</text><circle class="pt measured" cx="430.9" cy="190.9" r="6.5"/><text class="pt-label" x="441.9" y="188.9" text-anchor="start">nao</text><text class="pt-sub" x="441.9" y="201.9" text-anchor="start">46.3% &middot; 12</text><circle class="pt measured" cx="506.3" cy="246.6" r="6.5"/><text class="pt-label" x="517.3" y="244.6" text-anchor="start">CrewAI</text><text class="pt-sub" x="517.3" y="257.6" text-anchor="start">55.8% &middot; 8</text><circle class="pt measured" cx="585.9" cy="249.4" r="6.5"/><text class="pt-label" x="574.9" y="247.4" text-anchor="end">Snowflake Cortex Analyst</text><text class="pt-sub" x="574.9" y="260.4" text-anchor="end">65.8% &middot; 8</text><circle class="pt measured" cx="527.3" cy="269.4" r="6.5"/><text class="pt-label" x="538.3" y="267.4" text-anchor="start">Vanna</text><text class="pt-sub" x="538.3" y="280.4" text-anchor="start">58.4% &middot; 6</text></svg></div>
     </div>
     <p class="note">Latency and cost come from the live agent runs. Neither is currently folded into
        the score: an efficiency metric in the spirit of BIRD's VES is on the roadmap, and until it
@@ -480,7 +514,7 @@ function toggleTheme(){
 
 <footer id="method">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">04</span><h2>Method, in brief</h2></div>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Method, in brief</h2></div>
     <div class="cols">
       <p class="method">
         190 execution-scored questions, 9 tiers, one frozen snapshot.<br>
@@ -500,7 +534,7 @@ function toggleTheme(){
         the data does and does not model is in
         <a href="https://github.com/jjayeshneo/Cortex-Benchmark/blob/main/DATASHEET.md">DATASHEET.md</a>.
         <br><br>
-        <span class="tag">Built 2026-09-15 11:31 UTC from 7 entries.</span>
+        <span class="tag">Built 2026-09-16 19:04 UTC from 7 entries.</span>
       </p>
     </div>
   </div>

@@ -245,6 +245,54 @@ def tier_table(entries: list, snap: str) -> str:
       <p class="note">{legend}. Values are Pass^N: % of the tier solved on every run.</p>"""
 
 
+def session_table(entries: list, snap: str) -> str:
+    """Per-session multi-turn detail under the chained protocol.
+
+    A session passes only if EVERY turn in it passes on EVERY run, so session success rate is
+    a harsh binary. This table shows the turns behind that verdict, because 6-of-8 and 0-of-8
+    are both "fail" and they are not the same result.
+    """
+    order = {"reference": 0, "measured": 1, "legacy": 2}
+    ents = [e for e in sorted(entries, key=lambda e: (order[band_of(e, snap)], -passn(e)))
+            if e["results"].get("by_session")]
+    if not ents:
+        return '      <p class="note">No system has attempted the multi-turn sessions yet.</p>'
+    sess = sorted({s for e in ents for s in e["results"]["by_session"]},
+                  key=lambda s: (len(s), s))
+    sizes = {s: next(e["results"]["by_session"][s]["turns_total"]
+                     for e in ents if s in e["results"]["by_session"]) for s in sess}
+    head = "".join(f'<th class="num" title="{sizes[s]} turns">{html.escape(s)}</th>'
+                   for s in sess)
+    rows = []
+    for e in ents:
+        bs = e["results"]["by_session"]
+        cells = []
+        for s in sess:
+            v = bs.get(s)
+            if not v:
+                cells.append('<td class="num na">&mdash;</td>'); continue
+            frac = v["turns_passed"] / v["turns_total"]
+            mark = ' \u2713' if v["session_passed"] else ''
+            cells.append(f'<td class="num"><span class="heat" style="background:'
+                         f'color-mix(in srgb, var(--accent) {6 + 34 * frac:.0f}%, transparent)">'
+                         f'{v["turns_passed"]}/{v["turns_total"]}{mark}</span></td>')
+        ssr = e["results"].get("multi_turn_session_accuracy") or {}
+        n = ssr.get("n")
+        rows.append(f'        <tr><td>{html.escape(e["system"]["name"])}</td>'
+                    + "".join(cells)
+                    + f'<td class="num"><b>{"&mdash;" if n is None else f"{n}/8"}</b></td></tr>')
+    return f"""      <table class="breakdown">
+        <thead><tr><th>System</th>{head}<th class="num">SSR</th></tr></thead>
+        <tbody>
+{chr(10).join(rows)}
+        </tbody>
+      </table>
+      <p class="note">Cells are turns solved on every run, out of the turns in that session.
+         &#10003; marks a session where every turn passed &mdash; the only thing that counts
+         toward SSR. Sessions are labelled rather than named: six run to 4 turns, one to 8 and
+         one to 9. The tasks themselves are held out, so they are described and not identified.</p>"""
+
+
 def scatter(entries: list, snap: str, metric: str, y_title: str, fmt: str) -> str:
     """Accuracy against cost or latency. Bottom-right is best."""
     pts = [(e, e["results"].get(metric, {}).get("mean")) for e in entries]
@@ -505,6 +553,7 @@ def build(entries: list) -> str:
     <nav class="nav">
       <a href="#leaderboard">Leaderboard</a>
       <a href="#breakdown">By tier</a>
+      <a href="#multiturn">Multi-turn</a>
       <a href="#efficiency">Cost &amp; latency</a>
       <a href="#method">Method</a>
       <a href="{REPO_URL}">Repository</a>
@@ -598,9 +647,28 @@ def build(entries: list) -> str:
   </div>
 </section>
 
+<section id="multiturn">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Multi-turn: sessions, not turns</h2></div>
+    <p class="sec-desc">The 41 tier-9 turns belong to 8 conversations. Each turn is handed the
+       agent&rsquo;s <strong>own</strong> SQL from the previous turn &mdash; right or wrong, never
+       corrected, never gold. An error on turn 2 is inherited by turn 3, which is the point: this
+       measures whether a system can hold a conversation, not whether it can answer a question.
+       <strong>Session success rate counts a session only when every turn in it passes on every
+       run.</strong></p>
+    <div class="grid-scroll">
+{session_table(entries, snap)}
+    </div>
+    <p class="note">SSR is deliberately harsh, and the per-session cells are why it is shown
+       alongside them rather than alone: a system that solves 6 of 8 turns and one that solves 0
+       of 8 both score a failed session, and those are not the same system. Read the cells for
+       capability and the SSR column for reliability.</p>
+  </div>
+</section>
+
 <section id="efficiency">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">03</span><h2>Cost and latency against accuracy</h2></div>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Cost and latency against accuracy</h2></div>
     <p class="sec-desc">What each system spends to get where it got. Accuracy runs along the
        horizontal axis (Pass^N), so <strong>bottom-right is best</strong>: reliable and cheap,
        reliable and fast. Correctness alone is not the whole picture on a 58-million-row database &mdash; a query
@@ -625,7 +693,7 @@ def build(entries: list) -> str:
 
 <footer id="method">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">04</span><h2>Method, in brief</h2></div>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Method, in brief</h2></div>
     <div class="cols">
       <p class="method">
         {den} execution-scored questions, 9 tiers, one frozen snapshot.<br>

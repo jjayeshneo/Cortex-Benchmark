@@ -96,8 +96,12 @@ def cross_field_rules(entry: dict, stem: str, errs: list) -> None:
     if entry.get("entry_id") != stem:
         errs.append(f"entry_id {entry.get('entry_id')!r} != filename stem {stem!r}")
 
+    # by_tier and by_session are breakdown tables, not metrics: they map a key to a
+    # per-key result rather than carrying mean/std/runs, so the metric-shape checks below
+    # do not apply to them. Their own shapes are enforced by the JSON schema.
+    BREAKDOWNS = ("by_tier", "by_session")
     for name, m in (entry.get("results") or {}).items():
-        if not isinstance(m, dict) or name == "by_tier":
+        if not isinstance(m, dict) or name in BREAKDOWNS:
             continue
         p = f"results.{name}"
         runs = m.get("runs")
