@@ -9,6 +9,35 @@ rows are re-scored or retired, and that is recorded here too.
 
 ---
 
+## E-2026-09-18-15 — Databricks Genie cost filled in, at a proxy rate
+
+**What changed.** `results/2026-09-18-databricks-genie.json` carried `cost_usd_per_task: null` with
+the reason that the conversations API returns no per-request usage. That reason was correct about
+the API and wrong about the account: `system.billing.usage` meters Genie with
+`usage_metadata.genie.{surface,channel,agent_id}`, which attributes consumption to this space and
+this harness precisely. The field is now **$1.7265 per task**, derived the same way the Snowflake
+row's $0.1629 is — account metering divided by 447 task-runs — and the derivation is in the entry's
+notes.
+
+**One assumption is load-bearing and is not hidden.** The SKU is `GENIE_FREE_USAGE` and it has no
+row in `system.billing.list_prices`, because Genie was not charged for on this account during the
+run. The **actual invoice for this arm was zero.** The published figure prices the measured
+1,102.509 DBU at $0.70/DBU, the Premium serverless SQL compute rate this same workspace does pay,
+on the basis that Databricks meters Genie consumption in serverless SQL DBUs. The DBU counts are
+measured; only the multiplier is assumed, so the figure rescales linearly if Genie is priced
+differently when the free tier ends.
+
+**Why it is not comparable with the other rows, beyond the usual.** The cost column already mixes
+meters — OpenAI tokens, an API-equivalent estimate, Snowflake credits, and now Databricks DBUs at a
+proxy rate. This row adds a structural difference on top: it is the board's answer-track row, so
+Genie executed every query itself against the full 58.5M-row dataset and that compute is inside the
+number. The SQL-track rows only ever pay for inference plus a reference re-execution. Compare
+within a band, and read this one as an order of magnitude rather than a price.
+
+**Not affected.** No accuracy, latency or session figure changes. Pass^3 remains 117/190.
+
+---
+
 ## E-2026-09-18-14 — Databricks Genie enters answer-track, and one session was re-captured
 
 **What changed.** `results/2026-09-18-databricks-genie.json` adds Databricks Genie to the
