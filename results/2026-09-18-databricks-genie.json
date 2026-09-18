@@ -1,0 +1,148 @@
+{
+  "entry_id": "2026-09-18-databricks-genie",
+  "system": {
+    "name": "Databricks Genie",
+    "version": "Genie conversations API (Space grounded on the 22 base tables), databricks-sdk 0.136.0",
+    "organization": "Cortex-Bench organizers (reference implementation)",
+    "url": null,
+    "paper": null,
+    "code": null,
+    "open_source": false,
+    "kind": "single-call"
+  },
+  "model": {
+    "name": "Databricks Genie (managed, not disclosed)",
+    "provider": "Databricks",
+    "access": "api",
+    "training_cutoff": null,
+    "temperature": null,
+    "controlled": false
+  },
+  "protocol": {
+    "split": "full",
+    "corpus_version": "v1.3",
+    "data_snapshot_id": "wm_synthetic_v1.3_2026_09_01",
+    "scorer_version": "cortex_scorer_v1.6",
+    "runs": 3,
+    "denominator": 190,
+    "attempted": 190,
+    "evidence_provided": true,
+    "verified_by_organizers": true,
+    "evaluated_at": "2026-09-18T22:09:26Z"
+  },
+  "results": {
+    "execution_accuracy": {
+      "mean": 0.689474,
+      "n": 131,
+      "std": 0.02783,
+      "runs": [
+        0.7,
+        0.715789,
+        0.652632
+      ]
+    },
+    "session_accuracy": {
+      "mean": 0.624204,
+      "std": 0.0,
+      "runs": [
+        0.624204,
+        0.624204,
+        0.624204
+      ]
+    },
+    "multi_turn_session_accuracy": {
+      "mean": 0.0,
+      "std": 0.0,
+      "runs": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "n": 0
+    },
+    "multi_turn_turn_accuracy": {
+      "mean": 0.463415,
+      "std": 0.0,
+      "runs": [
+        0.463415,
+        0.463415,
+        0.463415
+      ],
+      "n": 19
+    },
+    "pass_any": {
+      "mean": 0.763158,
+      "n": 145
+    },
+    "pass_all": {
+      "mean": 0.615789,
+      "n": 117
+    },
+    "cost_usd_per_task": {
+      "mean": null,
+      "unavailable_reason": "Genie bills DBUs against the serving warehouse and the conversations API returns no per-request usage, so no per-task figure is derivable. The run metered 855.8 DBU of GENIE_FREE_USAGE (Genie itself is on the free tier) plus 61.4 DBU of billable serverless SQL compute across all 570 executions; that is warehouse uptime, not per-task cost, and dividing it by 570 would invent a number. Snowflake Cortex Analyst is recorded the same way."
+    },
+    "median_latency_s": {
+      "mean": 29.04
+    },
+    "by_tier": {
+      "1": 0.8571,
+      "2": 0.8667,
+      "3": 0.7143,
+      "4": 0.6571,
+      "5": 0.6,
+      "6": 0.36,
+      "7": 0.7,
+      "9": 0.4634
+    },
+    "by_session": {
+      "S1": {
+        "turns_passed": 3,
+        "turns_total": 9,
+        "session_passed": false
+      },
+      "S2": {
+        "turns_passed": 7,
+        "turns_total": 8,
+        "session_passed": false
+      },
+      "S3": {
+        "turns_passed": 1,
+        "turns_total": 4,
+        "session_passed": false
+      },
+      "S4": {
+        "turns_passed": 3,
+        "turns_total": 4,
+        "session_passed": false
+      },
+      "S5": {
+        "turns_passed": 0,
+        "turns_total": 4,
+        "session_passed": false
+      },
+      "S6": {
+        "turns_passed": 2,
+        "turns_total": 4,
+        "session_passed": false
+      },
+      "S7": {
+        "turns_passed": 2,
+        "turns_total": 4,
+        "session_passed": false
+      },
+      "S8": {
+        "turns_passed": 1,
+        "turns_total": 4,
+        "session_passed": false
+      }
+    }
+  },
+  "declarations": {
+    "canary_check": "not-applicable",
+    "test_data_seen": false,
+    "human_in_loop": false,
+    "artifacts": "databricks_agent/captures/genie_captures_run{1,2,3}.jsonl (149 single-turn) and genie_captures_mt_run{1,2,3}.jsonl (41 multi-turn turns), concatenated to genie_captures_190_run{1,2,3}.jsonl. Each row carries the question, Genie's SQL, the returned columns/types/rows, latency, conversation_id and the timeout in force. runs/genie_answer_run{1,2,3}.jsonl are the decoded answers, runs/genie_answer_sub{1,2,3}.json the submissions, runs/genie_answer_3run_score/ the verdicts.",
+    "notes": "COMMERCIAL BAND: Genie is a managed product bringing its own undisclosed model, so this is NOT a scaffold comparison against the four controlled arms, which all run gpt-5.6-luna. It belongs with Claude Code and Snowflake Cortex Analyst. ANSWER-TRACK, AND THIS ROW IS THE BOARD'S ONE EXCEPTION: every other arm is SQL-track -- the harness re-executes the agent's SQL on the single reference warehouse. This row is scored on the rows GENIE'S OWN warehouse returned, with nothing re-executed. That is only valid if the Databricks tables hold the data gold was computed from, so it was proved before any metered call: all 22 tables present, every row count exact (58,463,766 total), every column set matching, and 1,238 per-column aggregates (COUNT, COUNT DISTINCT, SUM, MIN, MAX) identical on both engines. The SQL-track was then computed from the SAME captures as a cross-check and lands at 115/190 against answer-track's 117/190 -- a 2-task, 1.1pp difference, which is the evidence that the load is faithful and the two methods agree. The SQL-track figure required adding one dialect rule (try_divide, which DuckDB lacks); before it, 63 statements that ran correctly on Databricks failed on DuckDB, and the cross-check would have measured the shim's coverage rather than the agent. DECODING: the Databricks SQL API returns every cell as a string, so values are decoded to native types using the column types Databricks reported in the same response. Nothing is rounded, reinterpreted or repaired; a cell that will not decode is left verbatim and allowed to fail. An executed query returning zero rows is submitted as the empty set, not as a missing answer -- 9 of the 10 tier-7 negative controls have the empty set as gold, and conflating the two would fail them. MULTI-TURN IS CHAINED THROUGH GENIE'S OWN CONVERSATION: turn 1 opens a conversation and every later turn is sent to that same conversation_id, so the agent carries its own context exactly as a user would experience it. No authored gold prior is ever substituted. Threading was verified intact across all 24 captured sessions. TIME LIMIT: 180 s per question, passed explicitly into the SDK and recorded on every row. This matters -- databricks-sdk's *_and_wait helpers default to a 1200 s timeout, so an unset value would have given Genie 6.7x the budget every other arm runs under. CAPTURE HEALTH: 570/570 executions recorded with status ok, zero retries, zero truncation, zero auth failures, zero rate-limit backoffs; 570/570 produced SQL. RE-CAPTURE DISCLOSED: in the first pass, four turns of one 9-turn session timed out when the capture host entered macOS Maintenance Sleep mid-call (confirmed by pmset, and by wall-clock elapsed exceeding measured latency by 14-53 minutes while time.monotonic stalled). Those were not Genie failures. That whole session was discarded and re-captured as a single clean conversation with sleep inhibited; the re-capture moved Pass^3 from 115 to 117 and tier-9 from 17 to 19. No other execution in the run was affected. ROW CAP: stored result rows are capped at 100,000, matching the Snowflake arm. An earlier 1,000 cap sat below the largest gold answer in the corpus (1,322 rows, Set-Match) and would have truncated and failed that task while uncapped arms got a fair attempt."
+  }
+}

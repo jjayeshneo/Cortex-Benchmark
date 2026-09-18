@@ -9,6 +9,39 @@ rows are re-scored or retired, and that is recorded here too.
 
 ---
 
+## E-2026-09-18-14 — Databricks Genie enters answer-track, and one session was re-captured
+
+**What changed.** `results/2026-09-18-databricks-genie.json` adds Databricks Genie to the
+commercial band at 117/190 Pass^3, 145/190 Pass@3, 19/41 tier-9 turns, 0/8 SSR.
+
+**Two things about this row differ from every other row and are disclosed rather than buried.**
+
+**1. It is scored answer-track.** Every other entry is SQL-track: the harness re-runs the SQL the
+agent wrote on the single reference warehouse. This row is scored on the rows Genie's own
+Databricks warehouse returned; nothing is re-executed. The organizers chose this deliberately for
+this arm. It is only a measurement of the agent if the Databricks load equals the frozen snapshot,
+so that was proved before any metered call: 22/22 tables, every row count exact (58,463,766 in
+total), every column set matching, and 1,238 per-column aggregates (COUNT, COUNT DISTINCT, SUM,
+MIN, MAX) identical on both engines. The SQL-track was then computed from the SAME captures, at no
+extra cost, as a cross-check: it lands at 115/190 against answer-track's 117/190 and gives an
+identical 19/41 on tier-9. A 2-task, 1.1-point difference between two independent methods is the
+evidence that the load is faithful. Producing that cross-check required adding one dialect rule
+(`try_divide`, which DuckDB does not have); before it, 63 statements that executed correctly on
+Databricks failed on DuckDB, and the comparison would have measured the shim rather than the agent.
+
+**2. One multi-turn session was discarded and re-captured.** In the first pass, four turns of one
+9-turn conversation timed out because the capture host entered macOS Maintenance Sleep mid-call.
+This was confirmed two ways: `pmset` logs the sleep/wake cycles across exactly that window, and the
+rows' wall-clock elapsed exceeds their measured latency by 14 to 53 minutes, which is only possible
+if `time.monotonic()` stalled while the UTC clock did not. Those were not Genie failures, but
+Pass^N requires all three runs, so they were suppressing two turns the agent solved in the other
+two runs. The whole session was discarded — not just the four turns, because a chained conversation
+cannot be re-entered at turn 5 — and re-captured as one clean threaded conversation with sleep
+inhibited. That moved Pass^3 from 115 to 117 and tier-9 from 17 to 19. No other execution in the
+570 was affected, and all three final runs record 190/190 with status `ok`.
+
+**Not affected.** No other entry, and no gold answer. The scorer, corpus and snapshot are unchanged.
+
 ## Open
 
 ### E-2026-09-01-02 — Tier 7 is 9/10 zero-row

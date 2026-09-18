@@ -31,6 +31,7 @@ generated from `results/*.json`, one committed file per row.
 |---|---|---|---|---|---|---|---|---|
 | 1 ‡ | Claude Code | Claude Sonnet ‡ | **70.5%** | 84.7% | 77.4% ± 1.6 | 0/8 | 3 | v1.3 |
 | 2 ‡ | Snowflake Cortex Analyst | managed, undisclosed ‡ | **65.8%** | 74.2% | 70.5% ± 0.9 | 0/8 | 3 | v1.3 |
+| 3 ‡ | Databricks Genie | managed, undisclosed ‡ | **61.6%** | 76.3% | 68.9% ± 2.8 | 0/8 | 3 | v1.3 |
 | 1 | Vanna | gpt-5.6-luna | **58.4%** | 72.6% | 66.7% ± 0.8 | 0/8 | 3 | v1.3 |
 | 2 | CrewAI | gpt-5.6-luna † | **55.8%** | 71.1% | 63.3% ± 2.1 | 0/8 | 3 | v1.3 |
 | 3 | LangChain SQL agent | gpt-5.6-luna | **54.2%** | 75.8% | 64.9% ± 1.7 | **1/8** | 3 | v1.3 |
@@ -45,15 +46,24 @@ E-2026-09-17-13). Neo-Cortex is the exception: it predates the change, is on the
 and takes no rank.
 
 **SSR is session success rate** — the fraction of the 8 multi-turn conversations a system
-completed *entirely*, on every run. One session has ever been completed, by one system. The
+completed *entirely*, on every run. One session has ever been completed, by one system.
+Databricks Genie came closest of the rest: 7 of the 8 turns in one conversation, on every run. The
 per-session turn counts are on the live board under **Multi-turn**, and they matter: a system
 that solves 6 of 8 turns and one that solves 0 of 8 both score a failed session.
 
-‡ **Two bands, ranked separately.** Rows 1–4 are the *controlled* arm: different scaffolds over
+‡ **Two bands, ranked separately.** The numbered rows are the *controlled* arm: different scaffolds over
 one fixed base model, so the ordering is a scaffold comparison. The ‡ rows are the *commercial*
 band — shipped products that bring their own model, which is not disclosed in Snowflake's case.
 A ‡ row above a numbered row is not evidence that its scaffold is better; it is a different
 system with a different model. Never read one ranking across both bands.
+
+‡‡ **Databricks Genie is the board's one answer-track row.** Every other system is scored by
+re-executing the SQL it wrote on the single reference warehouse. Genie is scored on the rows its
+own warehouse returned. That is only comparable if the Databricks tables hold the data gold was
+computed from, so it was verified first: all 22 tables, every row count exact (58,463,766), and
+1,238 per-column aggregates identical on both engines. The SQL-track was then computed from the
+same captures as a cross-check and lands at 115/190 against answer-track's 117/190 — a 2-task
+difference. Read the row knowing it was produced a different way, and see `ERRATA.md`.
 
 † The crew runs with `reasoning_effort=none`. gpt-5.6-luna is a reasoning model and OpenAI refuses
 function tools alongside reasoning on `/v1/chat/completions`; the LangChain arm keeps reasoning via
