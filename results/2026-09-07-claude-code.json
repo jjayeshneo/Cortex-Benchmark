@@ -8,7 +8,8 @@
     "paper": null,
     "code": null,
     "open_source": false,
-    "kind": "agent"
+    "kind": "agent",
+    "arm": "commercial"
   },
   "model": {
     "name": "sonnet",

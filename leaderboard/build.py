@@ -293,17 +293,23 @@ def session_table(entries: list, snap: str) -> str:
          one to 9. The tasks themselves are held out, so they are described and not identified.</p>"""
 
 
-CONTROLLED_MODEL = "gpt-5.6-luna"
-
-
 def arm_of(entry: dict) -> str:
-    """'controlled' (the fixed-base-model arm) or 'commercial' (brings its own model).
+    """'controlled' (a scaffold over the arm's one fixed base model) or 'commercial'.
 
-    Derived from the model NAME, not from model.controlled: that flag is False on every
-    entry published so far, so trusting it would file the whole board under one arm and
-    quietly erase the distinction the cost column depends on.
+    Read from system.arm, which every entry declares and the schema requires. It used to be
+    inferred by matching the model name against the controlled arm's base model, which was
+    wrong in the way inference usually is: it made the band a property of what a row RUNS
+    rather than of how it was EVALUATED, so re-basing the arm on a new model, or a product
+    that happened to report the same name, would have silently re-banded the board.
+
+    Not model.controlled -- that field is about weight custody and is correctly False on
+    every row here, controlled arm included, because all of them call a hosted endpoint.
     """
-    return "controlled" if (entry["model"].get("name") or "") == CONTROLLED_MODEL else "commercial"
+    arm = entry["system"].get("arm")
+    if arm not in ("controlled", "commercial"):
+        raise SystemExit(f'{entry["entry_id"]}: system.arm must be "controlled" or '
+                         f'"commercial", got {arm!r}. The band is declared, never guessed.')
+    return arm
 
 
 def efficiency_panels(entries: list, snap: str) -> str:

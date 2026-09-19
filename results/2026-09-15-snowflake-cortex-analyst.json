@@ -8,7 +8,8 @@
     "paper": null,
     "code": null,
     "open_source": false,
-    "kind": "single-call"
+    "kind": "single-call",
+    "arm": "commercial"
   },
   "model": {
     "name": "Snowflake Cortex Analyst (managed, not disclosed)",

@@ -25,7 +25,8 @@
       "required": [
         "name",
         "organization",
-        "open_source"
+        "open_source",
+        "arm"
       ],
       "properties": {
         "name": {
@@ -74,6 +75,14 @@
             "reference"
           ],
           "description": "reference = a mechanical floor or ceiling row, not a competing system."
+        },
+        "arm": {
+          "type": "string",
+          "enum": [
+            "controlled",
+            "commercial"
+          ],
+          "description": "Which band the row is ranked in. 'controlled' = a scaffold over the arm's one fixed base model, so the ordering is a scaffold comparison. 'commercial' = a shipped product bringing its own model. Never inferred from the model name: a row's band is a statement about how it was evaluated, not about what it runs. Distinct from model.controlled, which is about weight custody, not banding."
         }
       }
     },
@@ -124,7 +133,7 @@
             "boolean",
             "null"
           ],
-          "description": "true if the submitter controls the weights; false for a hosted endpoint that may change under them."
+          "description": "true if the submitter controls the weights; false for a hosted endpoint that may change under them. This is about weight custody and is NOT the leaderboard band -- every entry so far runs against a hosted endpoint and is correctly false here, including the controlled-arm rows. For the band, see system.arm."
         },
         "config_note": {
           "type": [

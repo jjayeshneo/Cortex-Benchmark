@@ -166,6 +166,12 @@ def selftest(schema: dict) -> int:
     cases.append(("undeclared extra field", g))
     h = copy.deepcopy(base); h["results"]["by_tier"]["7"] = 1.4
     cases.append(("tier accuracy above 1.0", h))
+    # The band decides which rows a reader may rank against each other, so an entry that
+    # omits it, or invents a third one, must not reach the board.
+    i_ = copy.deepcopy(base); del i_["system"]["arm"]
+    cases.append(("missing system.arm (the leaderboard band)", i_))
+    j_ = copy.deepcopy(base); j_["system"]["arm"] = "reference"
+    cases.append(("system.arm outside enum", j_))
 
     ok = True
     with tempfile.TemporaryDirectory() as td:
