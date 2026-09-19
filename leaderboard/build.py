@@ -293,52 +293,115 @@ def session_table(entries: list, snap: str) -> str:
          one to 9. The tasks themselves are held out, so they are described and not identified.</p>"""
 
 
-def scatter(entries: list, snap: str, metric: str, y_title: str, fmt: str) -> str:
-    """Accuracy against cost or latency. Bottom-right is best."""
-    pts = [(e, e["results"].get(metric, {}).get("mean")) for e in entries]
-    pts = [(e, y) for e, y in pts if y is not None and passn(e) > 0]
-    if not pts:
-        return ('<p class="note">No system has published this metric yet, so there is nothing to '
-                'plot. An unmeasured metric is left blank rather than drawn as a zero.</p>')
-    W, H, L, R, T, B = 760, 400, 62, 24, 20, 52
-    ymax = max(y for _, y in pts) * 1.25 or 1.0
-    xmax = max(passn(e) for e, _ in pts) * 1.20 or 1.0
+CONTROLLED_MODEL = "gpt-5.6-luna"
 
-    def sx(v): return L + (W - L - R) * (v / xmax)
-    def sy(v): return H - B - (H - T - B) * (v / ymax)
 
-    g = [f'<line class="axis-line" x1="{L}" y1="{H-B}" x2="{W-R}" y2="{H-B}"/>',
-         f'<line class="axis-line" x1="{L}" y1="{T}" x2="{L}" y2="{H-B}"/>']
-    for i in range(5):
-        yv = ymax * i / 4
-        y = sy(yv)
-        if i:
-            g.append(f'<line class="grid-line" x1="{L}" y1="{y:.1f}" x2="{W-R}" y2="{y:.1f}"/>')
-        g.append(f'<text class="axis-label" x="{L-10}" y="{y+4:.1f}" text-anchor="end">'
-                 f'{format(yv, fmt)}</text>')
-    for i in range(5):
-        xv = xmax * i / 4
-        x = sx(xv)
-        g.append(f'<text class="axis-label" x="{x:.1f}" y="{H-B+18}" text-anchor="middle">'
-                 f'{100*xv:.0f}%</text>')
-    g.append(f'<text class="axis-title" x="{(L+W-R)/2:.0f}" y="{H-B+40}" text-anchor="middle">'
-             f'Pass^N</text>')
-    g.append(f'<text class="axis-title" x="-{(T+H-B)/2:.0f}" y="16" transform="rotate(-90)" '
-             f'text-anchor="middle">{html.escape(y_title)}</text>')
-    for e, y in sorted(pts, key=lambda p: -p[1]):
-        band = band_of(e, snap)
-        cx, cy = sx(passn(e)), sy(y)
-        g.append(f'<circle class="pt {band}" cx="{cx:.1f}" cy="{cy:.1f}" r="6.5"/>')
-        anchor = "end" if cx > (W - R) * 0.72 else "start"
-        dx = -11 if anchor == "end" else 11
-        g.append(f'<text class="pt-label" x="{cx+dx:.1f}" y="{cy-2:.1f}" text-anchor="{anchor}">'
-                 f'{html.escape(e["system"]["name"])}</text>')
-        g.append(f'<text class="pt-sub" x="{cx+dx:.1f}" y="{cy+11:.1f}" text-anchor="{anchor}">'
-                 f'{100*passn(e):.1f}% &middot; {format(y, fmt)}</text>')
-    return (f'<div class="scatter-box"><svg viewBox="0 0 {W} {H}" role="img" '
-            f'aria-label="{html.escape(y_title)} against Pass^N">'
+def arm_of(entry: dict) -> str:
+    """'controlled' (the fixed-base-model arm) or 'commercial' (brings its own model).
+
+    Derived from the model NAME, not from model.controlled: that flag is False on every
+    entry published so far, so trusting it would file the whole board under one arm and
+    quietly erase the distinction the cost column depends on.
+    """
+    return "controlled" if (entry["model"].get("name") or "") == CONTROLLED_MODEL else "commercial"
+
+
+def efficiency_panels(entries: list, snap: str) -> str:
+    """Cost and latency per system, as two panels of one ranked dot plot.
+
+    A scatter was the obvious form and the wrong one, for two independent reasons. Seven
+    labelled points is past the three an all-pairs form can seat, so five of the seven
+    names overlapped; and cost spans 909x from Vanna to Genie, so on a linear axis six of
+    the seven sat on the baseline. Here the accuracy axis becomes the row ORDER: read down
+    for accuracy, across for spend, and a dot far right on a low row is paying for nothing.
+
+    Both measures share one row per system, so the same line carries what a system costs
+    and how slow it is -- the comparison the two separate scatters made you do by eye.
+
+    Cost is on a log axis because no linear axis holds three orders of magnitude. The marks
+    are dots, not bars: a bar's length is a claim about ratio, and on a log axis it is false.
+    """
+    rows = [e for e in entries
+            if band_of(e, snap) == "measured" and passn(e) > 0
+            and any((e["results"].get(m) or {}).get("mean") is not None
+                    for m in ("cost_usd_per_task", "median_latency_s"))]
+    if not rows:
+        return ('<p class="note">No system has published cost or latency yet, so there is nothing '
+                'to plot. An unmeasured metric is left blank rather than drawn as a zero.</p>')
+    rows.sort(key=passn, reverse=True)
+
+    #      metric                 header        axis title                 fmt   pre suf  log  ticks                        tick labels
+    PANELS = [
+        ("cost_usd_per_task", "COST / TASK", "USD per task (log scale)", ".4f", "$", "", True,
+         (0.001, 0.01, 0.1, 1, 10), ("$0.001", "$0.01", "$0.10", "$1", "$10"),
+         312, 608, 676),
+        ("median_latency_s", "MEDIAN LATENCY", "Seconds per task", ".1f", "", "s", False,
+         (0, 8, 16, 24, 32), ("0s", "8s", "16s", "24s", "32s"),
+         716, 976, 1048),
+    ]
+    W, PASS_X, NAME_X, ROW_H, TOP = 1060, 52, 64, 34, 46
+    last = TOP + (len(rows) - 1) * ROW_H
+    base, top_y, H = last + 24, 30, last + 24 + 58
+
+    g = [f'<text class="eff-head" x="{PASS_X}" y="20" text-anchor="end">PASS^N</text>',
+         f'<text class="eff-head" x="{NAME_X}" y="20">SYSTEM</text>']
+
+    def place(v, log, ticks, pl, pr):
+        lo, hi = ticks[0], ticks[-1]
+        if log:
+            import math
+            f = (math.log10(max(v, lo)) - math.log10(lo)) / (math.log10(hi) - math.log10(lo))
+        else:
+            f = (v - lo) / (hi - lo)
+        return pl + (pr - pl) * f
+
+    for metric, head, title, fmt, pre, suf, log, ticks, marks, pl, pr, vx in PANELS:
+        # centred over the panel AND its value column, since the two read as one block
+        g.append(f'<text class="eff-head" x="{(pl+vx)/2:.0f}" y="20" text-anchor="middle">'
+                 f'{html.escape(head)}</text>')
+        for t, m in zip(ticks, marks):
+            x = place(t, log, ticks, pl, pr)
+            g.append(f'<line class="eff-grid-line" x1="{x:.1f}" y1="{top_y}" x2="{x:.1f}" '
+                     f'y2="{base}"/>')
+            g.append(f'<text class="eff-axis-label" x="{x:.1f}" y="{base+16}" '
+                     f'text-anchor="middle">{html.escape(m)}</text>')
+        g.append(f'<line class="eff-axis-line" x1="{pl}" y1="{base}" x2="{pr}" y2="{base}"/>')
+        g.append(f'<text class="eff-axis-title" x="{(pl+pr)/2:.0f}" y="{base+40}" '
+                 f'text-anchor="middle">{html.escape(title)}</text>')
+
+    for i, e in enumerate(rows):
+        y = TOP + i * ROW_H
+        arm = arm_of(e)
+        name = html.escape(e["system"]["name"]) + ("&Dagger;" if arm == "commercial" else "")
+        cells, tips = [], []
+        for metric, head, title, fmt, pre, suf, log, ticks, marks, pl, pr, vx in PANELS:
+            m = e["results"].get(metric) or {}
+            v = m.get("mean")
+            cells.append(f'<line class="eff-row-line" x1="{pl}" y1="{y}" x2="{pr}" y2="{y}"/>')
+            if v is None:
+                why = html.escape(m.get("unavailable_reason") or "not measured")
+                cells.append(f'<text class="eff-na" x="{vx}" y="{y+4}" text-anchor="end">'
+                             f'<title>{why}</title>&mdash;</text>')
+                tips.append(f'{head.lower()} not measured')
+                continue
+            lab = f'{pre}{format(v, fmt)}{suf}'
+            cells.append(f'<circle class="eff-dot {arm}" '
+                         f'cx="{place(v, log, ticks, pl, pr):.1f}" cy="{y}" r="5.5"/>')
+            cells.append(f'<text class="eff-val" x="{vx}" y="{y+4}" text-anchor="end">'
+                         f'{lab}</text>')
+            tips.append(f'{head.lower()} {lab}')
+        tip = (f'{e["system"]["name"]} — Pass^N {100*passn(e):.1f}%, '
+               + ", ".join(tips) + f'; {arm} band')
+        g.append(f'<g class="eff-row"><title>{html.escape(tip)}</title>'
+                 f'<rect class="eff-hit" x="0" y="{y-ROW_H/2:.0f}" width="{W}" height="{ROW_H}"/>'
+                 f'<text class="eff-pass" x="{PASS_X}" y="{y+4}" text-anchor="end">'
+                 f'{100*passn(e):.1f}%</text>'
+                 f'<text class="eff-name" x="{NAME_X}" y="{y+4}">{name}</text>'
+                 + "".join(cells) + '</g>')
+
+    return (f'<div class="eff-box"><svg viewBox="0 0 {W} {H}" role="img" '
+            f'aria-label="Cost per task and median latency by system, ordered by Pass^N">'
             + "".join(g) + "</svg></div>")
-
 
 CSS = """
   :root{
@@ -346,6 +409,7 @@ CSS = """
     --rule:#DAD7CD; --rule-strong:#B9B5A8; --accent:#0F6E63; --accent-soft:#0F6E6318;
     --measured:#2B4C6F; --reference:#8A5A2B; --legacy:#7A7468; --warn:#9A5B12;
     --bar-track:#E4E1D8;
+    --arm-controlled:#2B6CB0; --arm-commercial:#A8620E;
     --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
     --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
     --mono:"SFMono-Regular",ui-monospace,"JetBrains Mono","Menlo",Consolas,monospace;
@@ -355,6 +419,7 @@ CSS = """
     --rule:#2C2E23; --rule-strong:#3D4030; --accent:#4FBFAF; --accent-soft:#4FBFAF1F;
     --measured:#7FA8CE; --reference:#C99A5F; --legacy:#8E8878; --warn:#E0A33E;
     --bar-track:#26281D;
+    --arm-controlled:#4C8FD0; --arm-commercial:#BE7A22;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -455,20 +520,30 @@ CSS = """
        font-weight:600}
   .heat{font-family:var(--mono);padding:4px 9px;border-radius:3px;display:inline-block;min-width:44px}
 
-  .scatter-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-  .scatter-box{border:1px solid var(--rule);border-radius:4px;background:var(--paper-2);
-               padding:18px 18px 10px}
+  .eff-legend{display:flex;flex-wrap:wrap;gap:8px 26px;margin:0 0 14px;
+              font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
+  .eff-legend span{display:flex;align-items:center;gap:7px}
+  .eff-legend i{width:10px;height:10px;border-radius:50%;flex:none}
+  .eff-legend i.controlled{background:var(--arm-controlled)}
+  .eff-legend i.commercial{background:var(--arm-commercial)}
+  .eff-box{border:1px solid var(--rule);border-radius:4px;background:var(--paper-2);
+           padding:18px 18px 10px;min-width:880px}
   svg{display:block;width:100%;height:auto;overflow:visible}
-  .axis-line{stroke:var(--rule-strong);stroke-width:1}
-  .grid-line{stroke:var(--rule);stroke-width:1;stroke-dasharray:2 4}
-  .axis-label{font-family:var(--mono);font-size:10px;fill:var(--ink-faint)}
-  .axis-title{font-family:var(--mono);font-size:11px;letter-spacing:.05em;fill:var(--ink-soft);
-              text-transform:uppercase}
-  .pt{fill:var(--measured)}
-  .pt.reference{fill:var(--reference)}
-  .pt.legacy{fill:var(--legacy)}
-  .pt-label{font-family:var(--mono);font-size:11px;fill:var(--ink);font-weight:600}
-  .pt-sub{font-family:var(--mono);font-size:9.5px;fill:var(--ink-faint)}
+  .eff-axis-line{stroke:var(--rule-strong);stroke-width:1}
+  .eff-grid-line,.eff-row-line{stroke:var(--rule);stroke-width:1}
+  .eff-axis-label{font-family:var(--mono);font-size:10px;fill:var(--ink-faint)}
+  .eff-axis-title{font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+                  fill:var(--ink-soft);text-transform:uppercase}
+  .eff-head{font-family:var(--mono);font-size:9px;letter-spacing:.08em;fill:var(--ink-faint)}
+  .eff-pass{font-family:var(--mono);font-size:10px;fill:var(--ink-faint)}
+  .eff-name{font-family:var(--mono);font-size:11px;fill:var(--ink);font-weight:600}
+  .eff-val{font-family:var(--mono);font-size:11px;fill:var(--ink);font-weight:600}
+  .eff-dot{stroke:var(--paper-2);stroke-width:2}
+  .eff-dot.controlled{fill:var(--arm-controlled)}
+  .eff-dot.commercial{fill:var(--arm-commercial)}
+  .eff-na{font-family:var(--mono);font-size:11px;fill:var(--ink-faint)}
+  .eff-hit{fill:transparent}
+  .eff-row:hover .eff-hit{fill:var(--accent-soft)}
 
   footer{padding:44px 0 68px}
   footer .cols{display:flex;flex-wrap:wrap;gap:44px;justify-content:space-between}
@@ -476,7 +551,6 @@ CSS = """
   footer .method{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);line-height:1.95}
   footer code{font-family:var(--mono);font-size:11.5px}
 
-  @media (max-width:860px){.scatter-grid{grid-template-columns:1fr}}
   @media (max-width:720px){.wrap{padding:0 20px}.nav{display:none}.hero-meta{gap:20px}}
 """
 
@@ -669,14 +743,23 @@ def build(entries: list) -> str:
 <section id="efficiency">
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">04</span><h2>Cost and latency against accuracy</h2></div>
-    <p class="sec-desc">What each system spends to get where it got. Accuracy runs along the
-       horizontal axis (Pass^N), so <strong>bottom-right is best</strong>: reliable and cheap,
-       reliable and fast. Correctness alone is not the whole picture on a 58-million-row database &mdash; a query
-       that returns the right answer in six minutes is not a usable one.</p>
-    <div class="scatter-grid">
-{scatter(entries, snap, "cost_usd_per_task", "USD per task", ".4f")}
-{scatter(entries, snap, "median_latency_s", "Median seconds", ".0f")}
+    <p class="sec-desc">What each system spends to get where it got. <strong>Rows are ordered by
+       accuracy</strong>, best at the top, and the dot is what that system spent &mdash; so read
+       down for accuracy and across for spend. A dot far to the right on a row near the bottom is
+       paying for nothing. Correctness alone is not the whole picture on a 58-million-row database
+       &mdash; a query that returns the right answer in six minutes is not a usable one.</p>
+    <div class="eff-legend">
+      <span><i class="commercial"></i>Commercial band &Dagger; &mdash; ships its own model</span>
+      <span><i class="controlled"></i>Controlled arm &mdash; one fixed base model</span>
     </div>
+    <div class="grid-scroll">
+{efficiency_panels(entries, snap)}
+    </div>
+    <p class="note">The cost axis is <strong>logarithmic</strong>: each gridline is ten times the
+       one before it. It has to be &mdash; the board spans $0.0019 to $1.7265 per task, a factor of
+       909, and on a linear axis six of the seven systems sit on the baseline. The marks are dots
+       rather than bars for the same reason: a bar's length is a claim about ratio, and on a log
+       axis that claim would be false. The latency axis is linear and starts at zero.</p>
     <p class="note">Latency and cost come from the live agent runs. Neither is currently folded into
        the score: an efficiency metric in the spirit of BIRD's VES is on the roadmap, and until it
        exists a slow correct answer ranks exactly like a fast one.</p>
@@ -685,7 +768,11 @@ def build(entries: list) -> str:
        task. Claude Code's is API-equivalent rather than billed &mdash; nothing was charged.
        Snowflake Cortex Analyst reports no per-request cost at all and is billed per message at a
        flat rate rather than per token, so its figure is derived from account-level credit
-       metering and is insensitive to how much context each call carried. Each row's <code>notes</code> field in
+       metering and is insensitive to how much context each call carried. Databricks Genie is
+       derived the same way from DBU metering, and is the one figure on the board priced at a rate
+       the account was not actually charged &mdash; Genie was free during the run, so the rate is
+       the vendor's published one for equivalent compute. It is also the only row whose cost
+       includes executing every query against the full warehouse. Each row's <code>notes</code> field in
        <code>results/</code> states exactly how its number was obtained. Read them before
        quoting a ratio between two rows.</p>
   </div>
