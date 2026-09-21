@@ -43,7 +43,7 @@ REPO_URL = "https://github.com/jjayeshneo/Cortex-Benchmark"
 TIER_NAMES = {
     1: "Schema linking", 2: "Single-table filter", 3: "Joins", 4: "Aggregation",
     5: "Window / ranking", 6: "Domain computation", 7: "Unanswerable / null-result",
-    8: "Open analysis (rubric)", 9: "Multi-turn session",
+    8: "Multi-turn session",
 }
 
 BANDS = {
@@ -647,7 +647,7 @@ def build(entries: list) -> str:
     <div class="eyebrow">Enterprise text-to-SQL &middot; snapshot {html.escape(snap)}</div>
     <h1>How accurately do data agents answer real wealth-management questions?</h1>
     <p>Cortex-Bench scores agents on {den} questions against a 22-table, 58-million-row synthetic
-       Indian wealth-management warehouse. Nine tiers, from schema linking to multi-turn sessions,
+       Indian wealth-management warehouse. Eight tiers, from schema linking to multi-turn sessions,
        including a tier whose correct answer is that the question cannot be answered from the data.
        Every row below was executed by the organizers, and every score is a mean over repeated runs.</p>
     <div class="hero-meta">
@@ -715,22 +715,24 @@ def build(entries: list) -> str:
     <div class="sec-head"><span class="sec-num">02</span><h2>Accuracy by difficulty tier</h2></div>
     <p class="sec-desc">Where each system actually loses. Tiers 1&ndash;2 are lookups and filters,
        3&ndash;5 add joins, aggregation and window functions, 6 requires applying Indian market and
-       taxation rules, 7 asks questions the data cannot answer, and 9 is multi-turn. Cells are
+       taxation rules, 7 asks questions the data cannot answer, and 8 is multi-turn. Cells are
        Pass^N, the same metric the board ranks on, so a tier row and a board row mean the same
        thing. Tiers a system never attempted are left out rather than shown as zero. Darker is
        stronger.</p>
     <div class="grid-scroll">
 {tier_table(entries, snap)}
     </div>
-    <p class="note">Tier 8 is excluded from every figure on this page: those ten tasks are graded
-       against a rubric and the judge is not implemented, so they are neither passes nor failures.</p>
+    <p class="note">The ladder carries no rubric-graded band. An earlier tier of ten open-ended
+       questions was scored by a judge that was never implemented, so it was neither passes nor
+       failures; it has been removed from the corpus rather than left sitting at zero, and the
+       multi-turn tier moved up into its place. See <code>ERRATA.md</code>, E-2026-09-21-16.</p>
   </div>
 </section>
 
 <section id="multiturn">
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">03</span><h2>Multi-turn: sessions, not turns</h2></div>
-    <p class="sec-desc">The 41 tier-9 turns belong to 8 conversations. Each turn is handed the
+    <p class="sec-desc">The 41 tier-8 turns belong to 8 conversations. Each turn is handed the
        agent&rsquo;s <strong>own</strong> SQL from the previous turn &mdash; right or wrong, never
        corrected, never gold. An error on turn 2 is inherited by turn 3, which is the point: this
        measures whether a system can hold a conversation, not whether it can answer a question.
@@ -789,7 +791,7 @@ def build(entries: list) -> str:
     <div class="sec-head"><span class="sec-num">05</span><h2>Method, in brief</h2></div>
     <div class="cols">
       <p class="method">
-        {den} execution-scored questions, 9 tiers, one frozen snapshot.<br>
+        {den} execution-scored questions, 8 tiers, one frozen snapshot.<br>
         Gold answers compiled by executing reference SQL against that snapshot.<br>
         Synthetic data: deterministic, seed 42, FK-integrity validated, no PII.<br>
         Scored by <code>eval/score_cortex_bench.py</code>, unmodified, by the organizers.<br>

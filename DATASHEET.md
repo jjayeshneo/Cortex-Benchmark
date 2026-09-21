@@ -34,7 +34,7 @@ clients, advisors, instruments, trades, positions, revenue.
 | Accounts | 18,430 |
 | Trades | 937,171, spanning 2022-01-17 to 2026-06-09 |
 | Position snapshots | 52,052,531 across 230 weekly dates |
-| Questions | 200 — 39 public, 161 held out |
+| Questions | 190 — 39 public, 151 held out |
 
 **Is any of this real data?** **No.** Every row is generated. There are no real people, no real
 account numbers, no real PAN identifiers, no customer records of any kind. Names, identifiers and
@@ -147,7 +147,7 @@ Database under CC BY-SA 4.0; code under Apache-2.0. Distributed as a single Duck
 published SHA-256. **Gold answers are snapshot-bound** — they were produced against
 `wm_synthetic_v1.3_2026_09_01` and are meaningless against any other snapshot.
 
-The 161 held-out questions are not distributed. Publishing them would end the benchmark's
+The 151 held-out questions are not distributed. Publishing them would end the benchmark's
 usefulness permanently, so a CI check refuses any commit containing a held-out task id or a
 gold-bearing field outside the sample file.
 
@@ -161,7 +161,7 @@ gold-bearing field outside the sample file.
 every gold answer, so any new snapshot ships with recompiled answers and a new id. Results are
 comparable only within a snapshot, and leaderboard entries record which one they used.
 
-**Known-broken right now:** nothing in the gold answers. The ten tier-9 turns that compiled to an
+**Known-broken right now:** nothing in the gold answers. The ten tier-8 turns that compiled to an
 empty answer under v1.2 were repaired in v1.3 (see [ERRATA.md](ERRATA.md), E-2026-09-01-F5): advisor
 AUM targets were re-pinned to each band's measured median book, and one ill-posed question was
 retargeted. The remaining known imbalance is tier 7, where 9 of 10 questions have a genuinely empty

@@ -12,8 +12,8 @@ verify your database hash before comparing.
 | | |
 |---|---|
 | Sample questions | **39** |
-| Held out for evaluation | **161** |
-| Tiers represented | 1–7 and 9 (tier 8 excluded, see below) |
+| Held out for evaluation | **151** |
+| Tiers represented | 1–8 — every tier in the ladder |
 | Multi-turn | one **complete** session, 4 turns |
 
 Two selection rules worth knowing, because they shape what you see:
@@ -21,11 +21,13 @@ Two selection rules worth knowing, because they shape what you see:
 1. **Multi-turn sessions are published whole or not at all.** Releasing turn 1 without its
    follow-ups would leak the session's premise and its coreference chain.
 
-2. **Tier 8 is not sampled.** It is rubric-scored and the judge is not released yet, so a sample
-   would demonstrate a scoring path you cannot run.
+2. **Every tier is represented.** The ladder used to carry a ninth, rubric-scored tier that no
+   sample could demonstrate, because its judge was never released. That tier has been removed
+   from the corpus and the multi-turn tier renumbered from 9 to 8 (`ERRATA.md`,
+   E-2026-09-21-16), so the sample now covers the ladder end to end.
 
 
-## The nine tiers
+## The eight tiers
 
 | Tier | Name | What it tests | In sample |
 |---|---|---|---|
@@ -36,8 +38,7 @@ Two selection rules worth knowing, because they shape what you see:
 | 5 | Window functions and ranking | Ordered analytics: running totals, percentiles, rank-within-group. | 5 |
 | 6 | Domain reasoning | Apply Indian wealth-management rules — tax, corporate actions, fee structures. | 5 |
 | 7 | Unanswerable and null-result | The correct answer is that there is no answer, or none. Guessing is penalised. | 5 |
-| 8 | Open-ended analysis | Rubric-scored narrative analysis. Excluded from this sample — the judge is not released yet. | 0 |
-| 9 | Multi-turn sessions | A conversation. Later turns refer to earlier ones by pronoun or ellipsis. | 4 |
+| 8 | Multi-turn sessions | A conversation. Later turns refer to earlier ones by pronoun or ellipsis. | 4 |
 
 ## Difficulty mix — read this before comparing to the corpus
 
@@ -118,7 +119,7 @@ representative subset and should not be used to estimate your score on the full 
 `CB_T7_141_T1` · Simple · scored by **Exact** · gold is **0 row(s)** — *the empty set is the correct answer*
 
 
-### Tier 9 — Multi-turn sessions
+### Tier 8 — Multi-turn sessions
 
 > How many clients were onboarded in each quarter of FY2024?
 
@@ -131,10 +132,10 @@ representative subset and should not be used to estimate your score on the full 
 
 ```
 task_id          stable identifier
-tier             1-9, see above
+tier             1-8, see above
 sql_difficulty   Simple | Medium | Advanced
 primary_axis     Schema | Data
-scoring_method   Set-Match | Ordered-Match | Scalar-Match | Rubric
+scoring_method   Set-Match | Exact | Value-Match | Ordered-List-Match | Scalar-Match
 question         the natural-language question
 domain_evidence  business context given to the agent; not a hint at the SQL
 gold_sql         the reference query

@@ -48,7 +48,7 @@ Each task declares one. It is in the sample file as `scoring_method`.
 | `Set-Match`, `Exact-Set`, `Unordered-Set`, `Row-Set-Match`, `Exact` | ignored | multiset of rows |
 | `Ordered-Match`, `Ordered-List-Match`, `List-Match` | **significant** | rows in sequence |
 | `Scalar-Match`, `Exact-Scalar` | n/a | one value |
-| `Rubric` | n/a | narrative, judged (tier 8; not in the sample) |
+| `Rubric` | n/a | retired — the open-ended tier it scored was removed from the corpus, and no task now carries this method. The scorer still recognises it so an old submission does not crash. |
 
 Order is only enforced where the question actually asks for an ordering.
 

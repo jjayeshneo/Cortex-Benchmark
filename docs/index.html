@@ -192,7 +192,7 @@ function toggleTheme(){
     <div class="eyebrow">Enterprise text-to-SQL &middot; snapshot wm_synthetic_v1.3_2026_09_01</div>
     <h1>How accurately do data agents answer real wealth-management questions?</h1>
     <p>Cortex-Bench scores agents on 190 questions against a 22-table, 58-million-row synthetic
-       Indian wealth-management warehouse. Nine tiers, from schema linking to multi-turn sessions,
+       Indian wealth-management warehouse. Eight tiers, from schema linking to multi-turn sessions,
        including a tier whose correct answer is that the question cannot be answered from the data.
        Every row below was executed by the organizers, and every score is a mean over repeated runs.</p>
     <div class="hero-meta">
@@ -467,13 +467,13 @@ function toggleTheme(){
     <div class="sec-head"><span class="sec-num">02</span><h2>Accuracy by difficulty tier</h2></div>
     <p class="sec-desc">Where each system actually loses. Tiers 1&ndash;2 are lookups and filters,
        3&ndash;5 add joins, aggregation and window functions, 6 requires applying Indian market and
-       taxation rules, 7 asks questions the data cannot answer, and 9 is multi-turn. Cells are
+       taxation rules, 7 asks questions the data cannot answer, and 8 is multi-turn. Cells are
        Pass^N, the same metric the board ranks on, so a tier row and a board row mean the same
        thing. Tiers a system never attempted are left out rather than shown as zero. Darker is
        stronger.</p>
     <div class="grid-scroll">
       <table class="breakdown">
-        <thead><tr><th>System</th><th class="num" title="Schema linking">T1</th><th class="num" title="Single-table filter">T2</th><th class="num" title="Joins">T3</th><th class="num" title="Aggregation">T4</th><th class="num" title="Window / ranking">T5</th><th class="num" title="Domain computation">T6</th><th class="num" title="Unanswerable / null-result">T7</th><th class="num" title="Multi-turn session">T9</th></tr></thead>
+        <thead><tr><th>System</th><th class="num" title="Schema linking">T1</th><th class="num" title="Single-table filter">T2</th><th class="num" title="Joins">T3</th><th class="num" title="Aggregation">T4</th><th class="num" title="Window / ranking">T5</th><th class="num" title="Domain computation">T6</th><th class="num" title="Unanswerable / null-result">T7</th><th class="num" title="Multi-turn session">T8</th></tr></thead>
         <tbody>
         <tr><td>Claude Code</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 38%, transparent)">93</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 38%, transparent)">93</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 36%, transparent)">89</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 34%, transparent)">83</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 20%, transparent)">40</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">100</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 19%, transparent)">39</span></td></tr>
         <tr><td>Snowflake Cortex Analyst</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">86</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 34%, transparent)">83</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 32%, transparent)">77</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 31%, transparent)">73</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">24</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 40%, transparent)">100</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 22%, transparent)">46</span></td></tr>
@@ -485,17 +485,19 @@ function toggleTheme(){
         <tr><td>Neo-Cortex</td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 35%, transparent)">86</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">67</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 29%, transparent)">69</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 28%, transparent)">66</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 17%, transparent)">33</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 9%, transparent)">8</span></td><td class="num"><span class="heat" style="background:color-mix(in srgb, var(--accent) 37%, transparent)">90</span></td><td class="num na">&mdash;</td></tr>
         </tbody>
       </table>
-      <p class="note"><b>T1</b> Schema linking &middot; <b>T2</b> Single-table filter &middot; <b>T3</b> Joins &middot; <b>T4</b> Aggregation &middot; <b>T5</b> Window / ranking &middot; <b>T6</b> Domain computation &middot; <b>T7</b> Unanswerable / null-result &middot; <b>T9</b> Multi-turn session. Values are Pass^N: % of the tier solved on every run.</p>
+      <p class="note"><b>T1</b> Schema linking &middot; <b>T2</b> Single-table filter &middot; <b>T3</b> Joins &middot; <b>T4</b> Aggregation &middot; <b>T5</b> Window / ranking &middot; <b>T6</b> Domain computation &middot; <b>T7</b> Unanswerable / null-result &middot; <b>T8</b> Multi-turn session. Values are Pass^N: % of the tier solved on every run.</p>
     </div>
-    <p class="note">Tier 8 is excluded from every figure on this page: those ten tasks are graded
-       against a rubric and the judge is not implemented, so they are neither passes nor failures.</p>
+    <p class="note">The ladder carries no rubric-graded band. An earlier tier of ten open-ended
+       questions was scored by a judge that was never implemented, so it was neither passes nor
+       failures; it has been removed from the corpus rather than left sitting at zero, and the
+       multi-turn tier moved up into its place. See <code>ERRATA.md</code>, E-2026-09-21-16.</p>
   </div>
 </section>
 
 <section id="multiturn">
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">03</span><h2>Multi-turn: sessions, not turns</h2></div>
-    <p class="sec-desc">The 41 tier-9 turns belong to 8 conversations. Each turn is handed the
+    <p class="sec-desc">The 41 tier-8 turns belong to 8 conversations. Each turn is handed the
        agent&rsquo;s <strong>own</strong> SQL from the previous turn &mdash; right or wrong, never
        corrected, never gold. An error on turn 2 is inherited by turn 3, which is the point: this
        measures whether a system can hold a conversation, not whether it can answer a question.
@@ -569,7 +571,7 @@ function toggleTheme(){
     <div class="sec-head"><span class="sec-num">05</span><h2>Method, in brief</h2></div>
     <div class="cols">
       <p class="method">
-        190 execution-scored questions, 9 tiers, one frozen snapshot.<br>
+        190 execution-scored questions, 8 tiers, one frozen snapshot.<br>
         Gold answers compiled by executing reference SQL against that snapshot.<br>
         Synthetic data: deterministic, seed 42, FK-integrity validated, no PII.<br>
         Scored by <code>eval/score_cortex_bench.py</code>, unmodified, by the organizers.<br>
@@ -586,7 +588,7 @@ function toggleTheme(){
         the data does and does not model is in
         <a href="https://github.com/jjayeshneo/Cortex-Benchmark/blob/main/DATASHEET.md">DATASHEET.md</a>.
         <br><br>
-        <span class="tag">Built 2026-09-19 14:54 UTC from 8 entries.</span>
+        <span class="tag">Built 2026-09-21 06:46 UTC from 8 entries.</span>
       </p>
     </div>
   </div>

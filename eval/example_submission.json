@@ -1,5 +1,5 @@
 {
-  "_note": "Example submission produced by the LangChain baseline against wm_synthetic_v1.3_2026_09_01. The four tier-9 turns carry a null prediction because that baseline is single-turn only; null scores as a failure. Note the difference from [], which is a real empty answer and is CORRECT for tier 7.",
+  "_note": "Example submission produced by the LangChain baseline against wm_synthetic_v1.3_2026_09_01. The four tier-8 turns carry a null prediction because that baseline is single-turn only; null scores as a failure. Note the difference from [], which is a real empty answer and is CORRECT for tier 7.",
   "predictions": [
     {
       "task_id": "CB_T1_001_T1",

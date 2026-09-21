@@ -9,7 +9,7 @@ knowing how Indian securities taxation actually works — not just how to write 
 
 | | Cortex-Bench | Spider | BIRD |
 |---|---|---|---|
-| Questions | 200 (39 public) | 10,181 | 12,751 |
+| Questions | 190 (39 public) | 10,181 | 12,751 |
 | Databases | **1** | 200 | 95 |
 | Rows | **58.5 M** | small | — |
 | Size | **1.07 GB** compressed | small | 33 GB |
@@ -116,7 +116,7 @@ these answers were compiled against — check the hash before investigating anyt
 
 ---
 
-## The nine tiers
+## The eight tiers
 
 | Tier | Name | What it tests |
 |---|---|---|
@@ -127,8 +127,7 @@ these answers were compiled against — check the hash before investigating anyt
 | 5 | Window functions | Running totals, percentiles, rank-within-group |
 | 6 | Domain reasoning | Apply Indian wealth-management rules — tax, corporate actions, fees |
 | 7 | Unanswerable / null-result | The correct answer is that there is none. Guessing is penalised |
-| 8 | Open-ended analysis | Rubric-scored narrative. Judge not yet released |
-| 9 | Multi-turn sessions | A conversation; later turns refer to earlier ones by pronoun or ellipsis |
+| 8 | Multi-turn sessions | A conversation; later turns refer to earlier ones by pronoun or ellipsis |
 
 Tier 7 is the one most benchmarks lack. An agent that always produces *some* SQL and *some* rows
 scores zero on it, which is the point: knowing a question cannot be answered from the data is part
@@ -195,10 +194,9 @@ Full DDL: [data/schema/wealth_management.sql](data/schema/wealth_management.sql)
 Stated by us, before anyone else states them.
 
 - **One database, one domain.** Cross-domain generalisation is not measured here.
-- **200 questions.** Small. 39 public, 161 held out.
+- **190 questions.** Small. 39 public, 151 held out.
 - **No human baseline.** We do not know the ceiling.
 - **No held-out test server yet.** The submission process is not live.
-- **Tier 8 (10 questions) is unscored** — the rubric judge is not implemented.
 - **Efficiency is not measured.** No VES-equivalent metric yet.
 
 Every one of these, plus each correction we have made and each one still open, is tracked in

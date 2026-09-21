@@ -5595,7 +5595,7 @@
     },
     {
       "task_id": "CB_MULTI_003_T1",
-      "tier": 9,
+      "tier": 8,
       "sql_difficulty": "Medium",
       "primary_axis": "Data",
       "question": "How many clients were onboarded in each quarter of FY2024?",
@@ -5633,7 +5633,7 @@
     },
     {
       "task_id": "CB_MULTI_003_T2",
-      "tier": 9,
+      "tier": 8,
       "sql_difficulty": "Medium",
       "primary_axis": "Data",
       "question": "Which quarter had the highest onboarding count and what referral sources drove it?",
@@ -5675,7 +5675,7 @@
     },
     {
       "task_id": "CB_MULTI_003_T3",
-      "tier": 9,
+      "tier": 8,
       "sql_difficulty": "Advanced",
       "primary_axis": "Data",
       "question": "Of the clients onboarded in that best quarter, how many placed their first trade within 90 days of onboarding?",
@@ -5695,7 +5695,7 @@
     },
     {
       "task_id": "CB_MULTI_003_T4",
-      "tier": 9,
+      "tier": 8,
       "sql_difficulty": "Advanced",
       "primary_axis": "Data",
       "question": "What is the current average AUM (in crore) of those quick-to-trade clients versus those from the same quarter who took longer than 90 days to place their first trade, counting only clients still active?",

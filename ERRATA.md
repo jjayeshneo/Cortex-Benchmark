@@ -7,6 +7,37 @@ Entries are dated, given a stable id, and marked **open** or **fixed**. Fixing a
 silently changes a published score: if a repair moves the gold answers, the affected leaderboard
 rows are re-scored or retired, and that is recorded here too.
 
+> **Tier numbering changed on 2026-09-21** (E-2026-09-21-16). The multi-turn tier is now
+> **tier 8**; it was tier 9. Entries below dated before that are left in the numbering that was
+> current when they were written, because a log that gets rewritten is not a log. Read
+> "tier-9" in an older entry as today's tier 8.
+
+---
+
+## E-2026-09-21-16 — The rubric tier is removed; multi-turn renumbered 9 to 8
+
+**What changed.** The ladder had nine tiers. Tier 8 was ten open-ended questions scored by an
+LLM judge, and that judge was never implemented, so those ten were neither passes nor failures --
+excluded from every figure, present in every count. They are now **removed from the corpus**, and
+the multi-turn tier moves up from **9 to 8**. The ladder is eight tiers: 1--7 single-question,
+8 multi-turn.
+
+**No score moves, and that is checkable.** The rubric tasks were already outside the scored
+denominator, so every published figure was computed over these same 190 items before and after.
+`by_tier` keys `"9"` became `"8"` in seven entries with their values untouched; the four sample
+questions carrying `tier: 9` now carry `tier: 8`. Pass^N, Pass@N, EX, SSR, per-tier and
+per-session numbers are all unchanged for all eight rows.
+
+**Counts that did change**, because they counted the rubric tasks: the corpus is **190 questions,
+39 public and 151 held out**, not 200 / 39 / 161. The `Rubric` scoring method is retired -- no task
+carries it, though the scorer still recognises it so an old submission fails loudly rather than
+crashing.
+
+**Why remove rather than leave it pending.** A tier that cannot be scored is not a hard tier, it is
+an absent one, and carrying it in the question count while excluding it from every metric made the
+headline denominator disagree with the corpus size in a way no reader could reconcile. The
+benchmark should not claim breadth it does not grade.
+
 ---
 
 ## E-2026-09-18-15 — Databricks Genie cost filled in, at a proxy rate
@@ -81,11 +112,17 @@ answer nothing" scores 90% on the tier. The tier is scheduled for rebalancing to
 zero-row and non-zero. Published as a floor row rather than left for a reader to discover.
 
 ### E-2026-09-01-03 — Tier 8 has no judge
-**Severity: medium. Affects: all 10 tier-8 tasks.**
+**Severity: medium. Affects: all 10 tier-8 tasks. CLOSED 2026-09-21 — see E-2026-09-21-16.**
 
 Open-analysis tasks are rubric-scored and the LLM-judge evaluator is not implemented. These ten
 tasks are excluded from the denominator entirely (190 gradable of 200) and reported as
 `rubric_pending`. They are not counted as failures and they are not counted as passes.
+
+**Resolution.** The judge was never built, so the tier was removed from the corpus rather than
+carried indefinitely as ten ungradable questions inside the question count. Closed by deletion,
+not by implementation — the honest description of what happened. The corpus is now 190 questions,
+all of them graded. (This entry predates the renumbering: its "tier 8" is the rubric tier, which
+no longer exists, not today's multi-turn tier 8.)
 
 ### E-2026-09-01-04 — Answer sets exceed a usable size
 **Severity: low. Affects: 25 tasks over 100 rows, max 870.**
