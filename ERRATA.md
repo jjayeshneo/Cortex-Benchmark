@@ -14,6 +14,38 @@ rows are re-scored or retired, and that is recorded here too.
 
 ---
 
+## E-2026-09-22-17 — Six entries claimed multi-turn was never attempted, and Genie's per-turn figure was the wrong metric
+
+**Two corrections, both in `declarations` and `results` rather than in any headline score.**
+
+**1. Six notes described a run that no longer existed.** LangChain SQL, CrewAI, nao, Vanna, Claude
+Code and Snowflake Cortex Analyst each carried a sentence beginning *"Single-turn only: the 41
+tier-8 multi-turn turns were not attempted and are scored as failures"*. Every one of those rows
+has since attempted all 41 turns, and their own `by_tier`, `by_session` and
+`multi_turn_turn_accuracy` fields said so in the same file. Claude Code's was the starkest: the
+note quoted execution accuracy as 67.0% while the entry published 77.4% and a tier-8 score of
+39.0%. The notes are rewritten from each entry's own data. Neo-Cortex keeps its version of the
+sentence, because for that row it is still true — it has no tier-8 result at all.
+
+**2. `multi_turn_turn_accuracy` on the Databricks Genie row held the wrong metric.** It read
+`mean 0.463415, runs [0.463415, 0.463415, 0.463415]` — the same value three times, which is not a
+thing three independent runs do. 0.463415 is 19/41, the **Pass^3** rate, copied into the per-run
+slots of a field that is defined as the per-run **turn accuracy**. The true per-run figures from
+the scored captures are 26, 24 and 20 turns of 41, so mean 0.569106 and std 0.074513.
+
+**The error was self-revealing, and the fix is checkable.** Execution accuracy over 190 is the
+turn-weighted blend of the single-turn and multi-turn figures, so
+`(190·EX − 41·MT) / 149` must reproduce a row's single-turn accuracy. With the published value
+that identity returned 75.17% for Genie against a ground truth of 72.26% from
+`runs/genie_answer_3run_score/`. With the corrected value it returns **72.26%**, exactly. The same
+identity supplied the single-turn figures now quoted in the six rewritten notes.
+
+**Nothing ranked changes.** Pass^N, Pass@N, execution accuracy, SSR, `by_tier` and `by_session`
+are untouched on all eight rows; Genie remains 117/190 with 19/41 tier-8 turns. The rendered
+leaderboard is unchanged, because no figure on the page reads `multi_turn_turn_accuracy`.
+
+---
+
 ## E-2026-09-21-16 — The rubric tier is removed; multi-turn renumbered 9 to 8
 
 **What changed.** The ladder had nine tiers. Tier 8 was ten open-ended questions scored by an
